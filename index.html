@@ -3,194 +3,1529 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>灵隐仙踪 · AI 生图</title>
+<title>AI 图片生成器 Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-sc@latest/chinese-simplified-400-normal.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-sc@latest/chinese-simplified-500-normal.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-sc@latest/chinese-simplified-700-normal.min.css">
 <style>
+:root{
+  --primary:#6366f1;--primary-hover:#4f46e5;--primary-soft:rgba(99,102,241,.16);
+  --success:#10b981;--error:#ef4444;--warning:#f59e0b;--info:#38bdf8;
+  --bg-dark:#0a0f1e;--bg-card:#121a2e;--bg-elevated:#1a2540;--bg-input:#0e1525;
+  --border:#27324d;--border-soft:#1e2940;
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --radius:14px;--shadow:0 10px 30px -10px rgba(0,0,0,.6);
+}
+html.light{
+  --bg-dark:#eef2f9;--bg-card:#ffffff;--bg-elevated:#f8fafc;--bg-input:#f1f5f9;
+  --border:#e2e8f0;--border-soft:#eef2f7;
+  --text-primary:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;
+  --shadow:0 10px 30px -12px rgba(15,23,42,.18);
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0f1e;color:#f1f5f9;min-height:100vh;display:flex;justify-content:center;padding:20px}
-.container{max-width:900px;width:100%}
-h1{font-size:24px;margin:20px 0;background:linear-gradient(135deg,#6366f1,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:flex;align-items:center;gap:10px}
-.card{background:#121a2e;border:1px solid #27324d;border-radius:14px;padding:20px;margin-bottom:16px}
-label{font-size:13px;color:#94a3b8;display:block;margin-bottom:6px;font-weight:600}
-textarea,.input,.select{width:100%;background:#0e1525;border:1px solid #27324d;color:#f1f5f9;border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;transition:border-color .2s}
-textarea:focus,.input:focus,.select:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.15)}
-textarea{min-height:80px;resize:vertical}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;border:none;transition:all .2s}
-.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 6px 18px -6px rgba(99,102,241,.5)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px -6px rgba(99,102,241,.6)}
-.btn-primary:disabled{opacity:.5;cursor:wait;transform:none}
-.btn-ghost{background:#1a2540;color:#94a3b8;border:1px solid #27324d}
-.btn-ghost:hover{background:#6366f1;color:#fff}
-.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-.row>*{flex:1;min-width:120px}
-.badge{display:inline-block;background:rgba(99,102,241,.15);color:#a5b4fc;border-radius:6px;padding:4px 10px;font-size:12px;margin:4px;cursor:pointer;transition:all .15s}
-.badge:hover{background:rgba(99,102,241,.3)}
-.badge.active{background:#6366f1;color:#fff}
-#result{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:16px}
-#result img{width:100%;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
-.status{text-align:center;color:#94a3b8;padding:20px;font-size:14px}
-.status .loading{display:inline-block;width:16px;height:16px;border:2px solid #6366f1;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+html{scroll-behavior:smooth}
+body{font-family:'Inter','Noto Sans SC',system-ui,sans-serif;background:var(--bg-dark);color:var(--text-primary);min-height:100vh;line-height:1.5;
+  background-image:radial-gradient(1200px 600px at 10% -10%,rgba(99,102,241,.12),transparent 60%),radial-gradient(900px 500px at 100% 0%,rgba(168,85,247,.10),transparent 55%);}
+html.light body{background-image:radial-gradient(1000px 500px at 10% -10%,rgba(99,102,241,.08),transparent 60%);}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:10px;font-weight:600;cursor:pointer;transition:all .18s ease;border:1px solid transparent;white-space:nowrap;font-size:.9rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff;box-shadow:0 6px 18px -6px rgba(99,102,241,.6)}
+.btn-primary:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 10px 24px -8px rgba(99,102,241,.7)}
+.btn-ghost{background:var(--bg-elevated);color:var(--text-primary);border-color:var(--border)}
+.btn-ghost:hover{background:var(--primary-soft);border-color:var(--primary)}
+.btn-danger{background:rgba(239,68,68,.12);color:var(--error);border-color:rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.input,.textarea,.select{width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:10px;padding:.6rem .8rem;font-size:.9rem;transition:border-color .15s,box-shadow .15s;font-family:inherit}
+.input:focus,.textarea:focus,.select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.textarea{resize:vertical;min-height:84px}
+.label{font-size:.78rem;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .55rem;border-radius:999px;font-size:.7rem;font-weight:600;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-secondary)}
+.badge-primary{background:var(--primary-soft);color:#a5b4fc;border-color:transparent}
+.badge-success{background:rgba(16,185,129,.14);color:#34d399;border-color:transparent}
+.badge-warning{background:rgba(245,158,11,.14);color:#fbbf24;border-color:transparent}
+.chip{padding:.35rem .7rem;border-radius:999px;font-size:.78rem;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;transition:all .15s;user-select:none}
+.chip:hover{border-color:var(--primary);color:var(--text-primary);background:var(--primary-soft)}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#a855f7);border:3px solid var(--bg-card);box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .12s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--primary);border:3px solid var(--bg-card);cursor:pointer}
+.switch{position:relative;width:46px;height:26px;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0}
+.switch .track{position:absolute;inset:0;background:var(--border);border-radius:999px;transition:.2s}
+.switch .track:before{content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.switch input:checked + .track{background:var(--primary)}
+.switch input:checked + .track:before{transform:translateX(20px)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px;color:#fca5a5;font-size:13px;margin-top:12px}
-.footer{text-align:center;color:#475569;font-size:12px;padding:20px}
-.style-chips{margin:8px 0;display:flex;flex-wrap:wrap;gap:4px}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.4)}50%{box-shadow:0 0 0 8px rgba(99,102,241,0)}}
+.fade-in{animation:fadeIn .4s ease both}
+.img-fade-in{animation:fadeIn .5s ease both}
+.skeleton{background:linear-gradient(90deg,var(--bg-elevated) 25%,var(--border) 37%,var(--bg-elevated) 63%);background-size:800px 100%;animation:shimmer 1.4s infinite linear;border-radius:12px}
+.spin{animation:spin 1s linear infinite}
+.pulse-glow{animation:pulseGlow 1.6s infinite}
+.drop-zone{border:2px dashed var(--border);border-radius:14px;padding:1.4rem;text-align:center;transition:all .2s;cursor:pointer;background:var(--bg-input)}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--primary);background:var(--primary-soft)}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}
+.thumb{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--bg-elevated)}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.thumb:hover img{transform:scale(1.08)}
+.thumb .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85),transparent 55%);opacity:0;transition:opacity .2s;display:flex;flex-direction:column;justify-content:flex-end;padding:.5rem;gap:.35rem}
+.thumb:hover .overlay{opacity:1}
+.thumb .top-badges{position:absolute;top:.4rem;left:.4rem;right:.4rem;display:flex;gap:.3rem;justify-content:space-between;opacity:0;transition:opacity .2s}
+.thumb:hover .top-badges{opacity:1}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.12);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.18);cursor:pointer;transition:all .15s}
+.icon-btn:hover{background:var(--primary);border-color:var(--primary)}
+.icon-btn.solid{background:var(--bg-elevated);color:var(--text-primary);border-color:var(--border)}
+.icon-btn.solid:hover{background:var(--primary-soft);color:var(--primary)}
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:1rem;background:rgba(2,6,23,.7);backdrop-filter:blur(6px)}
+.modal.open{display:flex}
+.modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);max-width:92vw;max-height:90vh;overflow:auto;animation:popIn .22s ease}
+#toastContainer{position:fixed;top:1rem;right:1rem;z-index:100;display:flex;flex-direction:column;gap:.6rem;max-width:380px}
+.toast{display:flex;align-items:flex-start;gap:.6rem;padding:.8rem 1rem;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);box-shadow:var(--shadow);animation:toastIn .3s ease;border-left:4px solid var(--info)}
+.toast.success{border-left-color:var(--success)}
+.toast.error{border-left-color:var(--error)}
+.toast.warning{border-left-color:var(--warning)}
+.toast .t-msg{font-size:.84rem;color:var(--text-primary);flex:1;word-break:break-all}
+.toast .t-close{cursor:pointer;color:var(--text-muted);font-size:1.1rem;line-height:1}
+.progress-track{height:8px;border-radius:999px;background:var(--bg-input);overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--primary),#a855f7,#ec4899);background-size:200% 100%;border-radius:999px;transition:width .25s ease;animation:shimmer 2s linear infinite}
+.viewer-stage{background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.viewer-stage img{max-width:100%;max-height:100%;transition:transform .2s;cursor:grab}
+.popover{position:absolute;z-index:40;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:.4rem;max-height:240px;overflow:auto;width:300px;max-width:80vw}
+.popover-item{padding:.5rem .7rem;border-radius:8px;font-size:.82rem;color:var(--text-secondary);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.popover-item:hover{background:var(--primary-soft);color:var(--text-primary)}
+.hidden{display:none!important}
+.divider{height:1px;background:var(--border-soft);margin:1rem 0}
+.kbd{font-family:ui-monospace,monospace;font-size:.72rem;padding:.1rem .4rem;border-radius:5px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-secondary)}
+details summary{list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details[open] .details-arrow{transform:rotate(90deg)}
+.details-arrow{display:inline-block;transition:transform .2s}
+.error-card{border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.07);border-radius:14px;padding:1.1rem;grid-column:1/-1}
+@media(max-width:1023px){.main-grid{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="top-bar">
-    <h1>✨ 灵隐仙踪 · AI 生图</h1>
-    <button class="btn btn-ghost" onclick="toggleDemo()" id="modeBtn">🎮 演示模式</button>
-  </div>
 
-  <div class="card">
-    <label>🎨 描述画面</label>
-    <textarea id="prompt" placeholder="例如：一只在樱花树下的橘猫，柔和光线，电影质感..."></textarea>
-    <div class="style-chips" id="chips"></div>
+<div id="toastContainer"></div>
 
-    <div class="row">
-      <div><label>尺寸</label><select id="size" class="select"><option>1024x1024</option><option>1792x1024</option><option>1024x1792</option></select></div>
-      <div><label>数量</label><select id="count" class="select"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+<!-- NAV -->
+<nav class="sticky top-0 z-30 backdrop-blur-xl" style="background:color-mix(in srgb,var(--bg-dark) 80%,transparent);border-bottom:1px solid var(--border)">
+  <div class="max-w-[1500px] mx-auto px-4 lg:px-6 h-16 flex items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--primary),#a855f7)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.4L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-1.6z"/></svg>
+      </div>
+      <div class="leading-tight">
+        <div class="font-bold text-[15px]">AI 图片生成器 <span style="color:var(--primary)">Pro</span></div>
+        <div class="text-[11px]" style="color:var(--text-muted)">文生图 · 图生图 · 批量创作</div>
+      </div>
     </div>
-
-    <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
-      <button class="btn btn-primary" id="genBtn" onclick="generate()">🚀 立即生成</button>
-      <span id="hint" style="color:#64748b;font-size:13px">等待中...</span>
+    <div class="ml-auto flex items-center gap-2">
+      <div class="hidden sm:flex items-center gap-2 mr-1">
+        <span class="badge" title="累计生成次数">⚡ <span id="statGens">0</span> 次</span>
+        <span class="badge badge-success" title="成功率">✓ <span id="statRate">-</span></span>
+        <span class="badge badge-primary" title="画廊数量">🖼 <span id="statGallery">0</span></span>
+      </div>
+      <button id="themeBtn" class="icon-btn solid" title="切换主题">
+        <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+      </button>
+      <button id="helpBtn" class="icon-btn solid" title="使用帮助">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+      </button>
+      <button id="settingsBtn" class="btn btn-ghost" style="padding:.5rem .9rem">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="hidden md:inline">设置</span>
+      </button>
     </div>
   </div>
+</nav>
 
-  <div id="result"></div>
-  <div class="footer">灵隐仙踪专属 · 基于 ciyuanapi GPT Image 2</div>
+<!-- MAIN -->
+<main class="max-w-[1500px] mx-auto px-4 lg:px-6 py-6">
+  <div class="main-grid grid gap-6" style="grid-template-columns:420px 1fr">
+
+    <!-- LEFT CONTROL PANEL -->
+    <aside class="space-y-4">
+      <div class="card p-4">
+        <div class="flex p-1 rounded-xl mb-4" style="background:var(--bg-input)">
+          <button class="mode-tab flex-1 py-2 rounded-lg text-sm font-semibold transition" data-mode="text">✨ 文生图</button>
+          <button class="mode-tab flex-1 py-2 rounded-lg text-sm font-semibold transition" data-mode="image">🖼 图生图</button>
+        </div>
+
+        <div id="dropZoneWrap" class="hidden mb-4">
+          <div id="dropZone" class="drop-zone">
+            <input type="file" id="uploadInput" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden">
+            <div id="uploadPlaceholder">
+              <svg class="mx-auto mb-2" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <div class="text-sm font-semibold">拖拽图片到此处 或 点击上传</div>
+              <div class="text-xs mt-1" style="color:var(--text-muted)">支持 JPG / PNG / WebP / GIF，≤ 10MB</div>
+            </div>
+            <div id="uploadPreviewWrap" class="hidden">
+              <img id="uploadPreview" class="mx-auto rounded-lg max-h-44 object-contain" alt="preview">
+              <div id="uploadName" class="text-xs mt-2 truncate" style="color:var(--text-secondary)"></div>
+              <button id="removeUpload" class="btn btn-danger mt-2" style="padding:.35rem .8rem;font-size:.78rem">移除图片</button>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="label"><span>重绘幅度 (Denoising)</span><span id="denoiseVal" class="badge badge-primary">0.75</span></div>
+            <input type="range" id="denoiseRange" min="0" max="1" step="0.01" value="0.75">
+            <div class="flex justify-between text-[10px] mt-1" style="color:var(--text-muted)"><span>保留原图</span><span>完全重绘</span></div>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="label"><span>正向提示词 <span style="color:var(--error)">*</span></span><span id="promptCount" class="text-[11px]" style="color:var(--text-muted)">0</span></div>
+          <textarea id="prompt" class="textarea" placeholder="描述你想生成的画面，例如：一只在樱花树下的猫，柔和光线，电影质感，超细节…" rows="3"></textarea>
+          <div class="flex gap-2 mt-2">
+            <button id="inspireBtn" class="chip">🎲 灵感</button>
+            <button id="historyBtn" class="chip">🕘 历史</button>
+            <button id="clearPromptBtn" class="chip" style="margin-left:auto">清空</button>
+          </div>
+          <div id="historyPopover" class="popover hidden" style="top:100%;left:0;margin-top:.4rem"></div>
+        </div>
+
+        <div class="mt-3">
+          <div class="label"><span>风格快捷标签</span><span class="text-[11px]" style="color:var(--text-muted)">点击追加</span></div>
+          <div id="styleChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="mt-3">
+          <button id="negativeToggle" class="flex items-center gap-2 text-sm font-semibold" style="color:var(--text-secondary)">
+            <svg id="negArrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s"><polyline points="9 18 15 12 9 6"/></svg>
+            反向提示词（可选）
+          </button>
+          <div id="negativeWrap" class="hidden mt-2">
+            <textarea id="negative" class="textarea" placeholder="不希望出现的元素，例如：low quality, blurry, deformed, watermark" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="font-bold text-sm">生成参数</div>
+          <span id="modelBadge" class="badge badge-primary">SDXL</span>
+        </div>
+
+        <div>
+          <div class="label"><span>尺寸比例</span></div>
+          <div id="sizePresets" class="grid grid-cols-5 gap-2">
+            <button class="chip size-preset active" data-w="1024" data-h="1024">1:1</button>
+            <button class="chip size-preset" data-w="1280" data-h="720">16:9</button>
+            <button class="chip size-preset" data-w="720" data-h="1280">9:16</button>
+            <button class="chip size-preset" data-w="1152" data-h="896">4:3</button>
+            <button class="chip size-preset" data-w="896" data-h="1152">3:4</button>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div>
+              <div class="label"><span>宽</span><span id="widthVal" class="text-[11px]" style="color:var(--text-muted)">1024</span></div>
+              <input type="range" id="widthRange" min="256" max="2048" step="64" value="1024">
+            </div>
+            <div>
+              <div class="label"><span>高</span><span id="heightVal" class="text-[11px]" style="color:var(--text-muted)">1024</span></div>
+              <input type="range" id="heightRange" min="256" max="2048" step="64" value="1024">
+            </div>
+          </div>
+        </div>
+
+        <div class="divider" style="margin:.5rem 0"></div>
+
+        <div>
+          <div class="label"><span>采样步数 (Steps)</span><span id="stepsVal" class="badge badge-primary">30</span></div>
+          <input type="range" id="stepsRange" min="1" max="150" step="1" value="30">
+        </div>
+        <div>
+          <div class="label"><span>提示词相关度 (CFG)</span><span id="cfgVal" class="badge badge-primary">7</span></div>
+          <input type="range" id="cfgRange" min="1" max="30" step="0.5" value="7">
+        </div>
+        <div>
+          <div class="label"><span>采样器</span></div>
+          <select id="samplerSelect" class="select"></select>
+        </div>
+        <div>
+          <div class="label"><span>模型</span></div>
+          <select id="modelSelect" class="select">
+            <option value="sdxl">SDXL</option>
+            <option value="sd15">Stable Diffusion 1.5</option>
+            <option value="sd3">Stable Diffusion 3</option>
+            <option value="dall-e-3">DALL·E 3</option>
+            <option value="gpt-image-2">GPT Image 2</option>
+          </select>
+        </div>
+        <div>
+          <div class="label"><span>随机种子 (Seed)</span></div>
+          <div class="flex gap-2">
+            <input type="number" id="seedInput" class="input" value="-1" style="flex:1">
+            <button id="seedDice" class="icon-btn solid" title="随机种子">🎲</button>
+            <button id="seedLock" class="icon-btn solid" title="锁定种子">
+              <svg id="lockIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </button>
+          </div>
+          <div class="text-[10px] mt-1" style="color:var(--text-muted)">-1 表示随机；锁定后可复现相同结果</div>
+        </div>
+        <div>
+          <div class="label"><span>批量数量</span><span id="batchVal" class="badge badge-primary">1</span></div>
+          <input type="range" id="batchRange" min="1" max="8" step="1" value="1">
+        </div>
+      </div>
+
+      <div class="card p-4">
+        <button id="generateBtn" class="btn btn-primary w-full" style="padding:.85rem;font-size:1rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span id="genBtnText">立即生成</span>
+        </button>
+        <button id="cancelBtn" class="btn btn-danger w-full hidden mt-2" style="padding:.7rem">
+          <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="40 20"/></svg>
+          取消生成
+        </button>
+        <div id="progressArea" class="hidden mt-4">
+          <div class="flex justify-between text-xs mb-1"><span id="progressStatus" style="color:var(--text-secondary)">准备中…</span><span id="progressPercent" style="color:var(--primary);font-weight:700">0%</span></div>
+          <div class="progress-track"><div id="progressBar" class="progress-fill"></div></div>
+          <div class="text-[11px] mt-1" style="color:var(--text-muted)">预计剩余 <span id="progressEta">--</span></div>
+        </div>
+        <div class="text-center text-[11px] mt-3" style="color:var(--text-muted)">快捷键 <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> 生成 · <span class="kbd">Esc</span> 关闭弹窗</div>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <section class="space-y-6">
+      <div class="card p-4 lg:p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <h2 class="font-bold text-base">生成结果</h2>
+            <span id="resultCount" class="badge">0</span>
+          </div>
+          <button id="clearResults" class="chip hidden">清空结果</button>
+        </div>
+        <div id="resultsGrid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"></div>
+        <div id="resultsEmpty" class="text-center py-14">
+          <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-3" style="background:var(--bg-elevated)">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="font-semibold" style="color:var(--text-secondary)">还没有生成结果</div>
+          <div class="text-xs mt-1" style="color:var(--text-muted)">在左侧输入提示词并点击「立即生成」开始创作</div>
+        </div>
+      </div>
+
+      <div class="card p-4 lg:p-5">
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <h2 class="font-bold text-base">作品画廊</h2>
+          <span id="galleryCount" class="badge badge-primary">0 / 50</span>
+          <div class="ml-auto flex flex-wrap items-center gap-2">
+            <input id="gallerySearch" class="input" placeholder="搜索提示词…" style="width:180px;padding:.45rem .7rem">
+            <select id="galleryFilter" class="select" style="width:auto;padding:.45rem .7rem">
+              <option value="all">全部</option>
+              <option value="text">文生图</option>
+              <option value="image">图生图</option>
+            </select>
+            <button id="exportBtn" class="icon-btn solid" title="导出画廊 (JSON)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+            <button id="clearGalleryBtn" class="icon-btn solid" title="清空画廊">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="galleryGrid" class="gallery-grid"></div>
+        <div id="galleryEmpty" class="text-center py-12 hidden">
+          <div class="text-sm" style="color:var(--text-muted)">画廊为空，生成的作品会自动保存在这里（本地浏览器）</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="max-w-[1500px] mx-auto px-6 py-8 text-center text-xs" style="color:var(--text-muted)">
+  AI 图片生成器 Pro · 所有数据仅保存在你的浏览器本地 · 演示模式可无需 API 直接体验
+</footer>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal">
+  <div class="modal-box" style="width:580px">
+    <div class="flex items-center justify-between p-5" style="border-bottom:1px solid var(--border)">
+      <div class="flex items-center gap-2 font-bold text-lg">⚙️ API 设置</div>
+      <button class="icon-btn solid" data-close>✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <div class="flex items-center justify-between p-3 rounded-xl" style="background:var(--primary-soft)">
+        <div>
+          <div class="font-semibold text-sm">🎮 演示模式</div>
+          <div class="text-xs" style="color:var(--text-secondary)">无需配置 API，使用内置示例图模拟生成流程</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="demoMode"><span class="track"></span></label>
+      </div>
+      <button id="presetCiyuanapi" class="btn btn-primary w-full" style="padding:.6rem">⚡ 快速接入 ciyuanapi（GPT Image 2 · 灵隐仙踪专用）</button>
+      <div id="apiFields" class="space-y-4">
+        <div>
+          <div class="label"><span>接口类型</span></div>
+          <select id="apiType" class="select">
+            <option value="sdwebui">Stable Diffusion WebUI (AUTOMATIC1111)</option>
+            <option value="openai">OpenAI 兼容接口（中转 / OneAPI / NewAPI）</option>
+            <option value="custom">自定义接口</option>
+          </select>
+        </div>
+        <div>
+          <div class="label"><span>接口地址 (Base URL)</span></div>
+          <input id="apiUrl" class="input" placeholder="例如 http://127.0.0.1:7860 或 https://your-proxy.com">
+          <div class="text-[11px] mt-1" style="color:var(--text-muted)">SDWebUI 通常为 http://127.0.0.1:7860（需加 --api 启动参数）；OpenAI 兼容接口填到根域名即可，无需加 /v1</div>
+        </div>
+        <div id="openaiModelWrap">
+          <div class="label"><span>OpenAI 模型名称</span><span class="badge badge-warning">重要</span></div>
+          <input id="openaiModel" class="input" list="openaiModelList" placeholder="gpt-image-1">
+          <datalist id="openaiModelList">
+            <option value="gpt-image-1"></option>
+            <option value="gpt-image-2"></option>
+            <option value="dall-e-3"></option>
+            <option value="dall-e-2"></option>
+          </datalist>
+          <div class="text-[11px] mt-1" style="color:var(--text-muted)">若报错「模型无可用渠道 / model_not_found」，请到中转后台确认你的分组支持的模型名，并在此处修改</div>
+        </div>
+        <div>
+          <div class="label"><span>API 密钥 (可选)</span></div>
+          <input id="apiKey" class="input" type="password" placeholder="sk-... 或留空">
+        </div>
+        <div>
+          <div class="label"><span>超时时间 (秒)</span></div>
+          <input id="timeoutInput" class="input" type="number" min="10" max="600" value="120">
+        </div>
+        <button id="testApiBtn" class="btn btn-ghost w-full" style="padding:.6rem">🔌 测试连接</button>
+      </div>
+    </div>
+    <div class="flex gap-3 p-5" style="border-top:1px solid var(--border)">
+      <button id="resetSettingsBtn" class="btn btn-danger" style="padding:.6rem 1rem">恢复默认</button>
+      <button id="saveSettingsBtn" class="btn btn-primary ml-auto" style="padding:.6rem 1.4rem">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEWER MODAL -->
+<div id="viewerModal" class="modal">
+  <div class="modal-box flex flex-col" style="width:1100px;height:88vh">
+    <div class="flex items-center justify-between p-4" style="border-bottom:1px solid var(--border)">
+      <div class="flex items-center gap-2"><span class="font-bold">作品详情</span><span id="viewerCounter" class="badge"></span></div>
+      <div class="flex items-center gap-2">
+        <button id="viewerZoomOut" class="icon-btn solid" title="缩小">−</button>
+        <button id="viewerZoomReset" class="icon-btn solid" title="重置">⤢</button>
+        <button id="viewerZoomIn" class="icon-btn solid" title="放大">＋</button>
+        <button id="viewerDownload" class="icon-btn solid" title="下载">⬇</button>
+        <button id="viewerReuse" class="icon-btn solid" title="复用参数">♻</button>
+        <button id="viewerDelete" class="icon-btn solid" title="删除" style="color:var(--error)">🗑</button>
+        <button class="icon-btn solid" data-close>✕</button>
+      </div>
+    </div>
+    <div class="flex-1 grid overflow-hidden" style="grid-template-columns:1fr 320px">
+      <div class="viewer-stage relative">
+        <img id="viewerImage" alt="viewer">
+        <button id="viewerPrev" class="icon-btn" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:42px;height:42px">‹</button>
+        <button id="viewerNext" class="icon-btn" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:42px;height:42px">›</button>
+      </div>
+      <div class="p-4 overflow-auto" style="border-left:1px solid var(--border);background:var(--bg-elevated)">
+        <div class="label"><span>提示词</span><button id="copyPromptBtn" class="chip" style="padding:.15rem .5rem">复制</button></div>
+        <div id="viewerPrompt" class="text-sm p-3 rounded-lg mb-4" style="background:var(--bg-input);border:1px solid var(--border);white-space:pre-wrap;word-break:break-word"></div>
+        <div id="viewerNegWrap" class="hidden mb-4">
+          <div class="label"><span>反向提示词</span></div>
+          <div id="viewerNeg" class="text-xs p-3 rounded-lg" style="background:var(--bg-input);border:1px solid var(--border);white-space:pre-wrap"></div>
+        </div>
+        <div class="label"><span>生成参数</span></div>
+        <div id="viewerMeta" class="space-y-2 text-xs"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HELP MODAL -->
+<div id="helpModal" class="modal">
+  <div class="modal-box" style="width:600px">
+    <div class="flex items-center justify-between p-5" style="border-bottom:1px solid var(--border)">
+      <div class="font-bold text-lg">📖 使用帮助</div>
+      <button class="icon-btn solid" data-close>✕</button>
+    </div>
+    <div class="p-5 space-y-4 text-sm" style="color:var(--text-secondary)">
+      <div>
+        <div class="font-bold mb-1" style="color:var(--text-primary)">🚀 快速开始</div>
+        <ol class="list-decimal pl-5 space-y-1 text-[13px]">
+          <li>首次使用可在「设置」中开启 <b>演示模式</b> 直接体验，或填写你的 API 地址。</li>
+          <li>选择 <b>文生图</b> 或 <b>图生图</b> 模式，输入提示词。</li>
+          <li>调整参数（步数、CFG、尺寸、种子等），点击「立即生成」。</li>
+          <li>结果会自动保存到下方画廊，可点击查看、下载、复用参数。</li>
+        </ol>
+      </div>
+      <div>
+        <div class="font-bold mb-1" style="color:var(--text-primary)">🔧 常见错误排查</div>
+        <ul class="list-disc pl-5 space-y-1 text-[13px]">
+          <li><b>503 model_not_found / 无可用渠道</b>：中转分组下该模型不可用。到「设置」修改「OpenAI 模型名称」为后台实际支持的名字（如 dall-e-3），或联系 API 提供方。</li>
+          <li><b>401 / Incorrect API key</b>：密钥错误或额度不足。</li>
+          <li><b>Failed to fetch</b>：地址不可达，或 API 未开启 CORS（浏览器直连需服务端允许跨域，可用本地代理转发）。</li>
+          <li><b>超时</b>：在「设置」中增大超时时间（批量/高分辨率生成耗时更长）。</li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-bold mb-1" style="color:var(--text-primary)">⌨️ 快捷键</div>
+        <div class="grid grid-cols-2 gap-2 text-[13px]">
+          <div><span class="kbd">Ctrl</span>+<span class="kbd">Enter</span> 生成</div>
+          <div><span class="kbd">Esc</span> 关闭弹窗</div>
+          <div><span class="kbd">←</span> / <span class="kbd">→</span> 切换作品</div>
+          <div><span class="kbd">+</span> / <span class="kbd">−</span> 缩放查看</div>
+        </div>
+      </div>
+      <div>
+        <div class="font-bold mb-1" style="color:var(--text-primary)">💡 提示</div>
+        <ul class="list-disc pl-5 space-y-1 text-[13px]">
+          <li>使用风格标签或「灵感」按钮快速填充高质量提示词。</li>
+          <li>锁定种子可复现完全相同的画面，便于微调提示词。</li>
+          <li>画廊最多保存 50 张，超出会自动移除最旧的作品。</li>
+          <li>所有数据仅存于本地浏览器，关闭页面不会上传。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-const STYLES = ['赛博朋克','水彩画','电影质感','动漫','写实摄影','3D渲染','油画','极简','奇幻','像素风'];
-const STYLE_PROMPTS = {
-  '赛博朋克':'cyberpunk, neon lights, futuristic city, cinematic',
-  '水彩画':'watercolor painting, soft edges, artistic, pastel',
-  '电影质感':'cinematic lighting, film grain, dramatic, 8k',
-  '动漫':'anime style, detailed illustration, vibrant colors',
-  '写实摄影':'photorealistic, dslr, sharp focus, natural light',
-  '3D渲染':'3d render, octane render, ray tracing, highly detailed',
-  '油画':'oil painting, classical art, rich texture, masterpiece',
-  '极简':'minimalist, clean composition, simple, elegant',
-  '奇幻':'fantasy art, magical, ethereal, epic',
-  '像素风':'pixel art, retro game style, 16-bit'
+(function(){
+'use strict';
+
+/* ============ CONFIG ============ */
+const CONFIG = {
+  MAX_GALLERY_SIZE: 50,
+  MAX_BATCH_SIZE: 8,
+  DEFAULT_TIMEOUT: 120,
+  PROGRESS_UPDATE_INTERVAL: 200,
+  STORAGE_KEY: 'aiGallery_v2',
+  SETTINGS_KEY: 'aiSettings_v3',
+  HISTORY_KEY: 'aiPromptHistory_v1',
+  STATS_KEY: 'aiStats_v1',
+  THEME_KEY: 'aiTheme_v1'
 };
-const DEMO_IMGS = [
-  'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/1cedd7795-f99d-4691-a2f9-63b2e4a72983.png',
-  'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/1ff409047-dee0-4a7e-b5e5-16af87183e26.png',
-  'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/1e5f72766-cc7f-462c-af84-e71354a053a3.png',
-  'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/16b445943-9608-4e7a-9dd0-ce0c54a03a5f.png'
+
+const MODEL_NAMES = {
+  'sdxl':'SDXL','sd15':'Stable Diffusion 1.5','sd3':'Stable Diffusion 3',
+  'dall-e-3':'DALL·E 3','gpt-image-2':'GPT Image 2'
+};
+
+const SAMPLERS = ['Euler a','Euler','DPM++ 2M Karras','DPM++ SDE Karras','DPM++ 2M SDE Karras','DDIM','UniPC','Heun'];
+
+const STYLE_PRESETS = [
+  {name:'赛博朋克', prompt:'cyberpunk, neon lights, futuristic city, cinematic'},
+  {name:'水彩画', prompt:'watercolor painting, soft edges, artistic, pastel'},
+  {name:'电影质感', prompt:'cinematic lighting, film grain, dramatic, 8k'},
+  {name:'动漫', prompt:'anime style, detailed illustration, vibrant colors'},
+  {name:'写实摄影', prompt:'photorealistic, dslr, sharp focus, natural light'},
+  {name:'3D 渲染', prompt:'3d render, octane render, ray tracing, highly detailed'},
+  {name:'油画', prompt:'oil painting, classical art, rich texture, masterpiece'},
+  {name:'极简', prompt:'minimalist, clean composition, simple, elegant'},
+  {name:'奇幻', prompt:'fantasy art, magical, ethereal, epic'},
+  {name:'像素风', prompt:'pixel art, retro game style, 16-bit'}
 ];
 
-let isDemo = true;
+const INSPIRATION = [
+  '一只戴着宇航员头盔的橘猫漂浮在星空中，梦幻光线，超细节',
+  '赛博朋克雨夜街道，霓虹招牌倒映在湿漉漉的地面，飞行汽车',
+  '悬浮在云海之上的奇幻岛屿，瀑布倾泻，古老遗迹，金色夕阳',
+  '樱花树下的银发少女，柔和光线，唯美动漫插画',
+  '雾气缭绕的清晨松林，阳光穿透薄雾，宁静湖面倒影',
+  '抽象流体艺术，靛蓝紫红与金色漩涡，大理石墨水纹理',
+  '深空星云，紫色与青色气体云，带光环的行星，壮丽宇宙',
+  '微缩世界，苔藓上的小村庄，移轴摄影，温暖光线',
+  '未来主义图书馆，无限延伸的书架，漂浮的发光书籍',
+  '水墨风格的远山与孤舟，留白意境，东方美学',
+  '蒸汽朋克机械龙，黄铜齿轮，喷吐蓝色火焰，精细结构',
+  '阳光下的向日葵花田，梵高笔触，浓烈色彩'
+];
 
-function initChips() {
-  const c = document.getElementById('chips');
-  STYLES.forEach(s => {
-    const b = document.createElement('span');
-    b.className = 'badge';
-    b.textContent = s;
-    b.onclick = () => {
-      const ta = document.getElementById('prompt');
-      const english = STYLE_PROMPTS[s];
-      ta.value = ta.value.trim() ? ta.value.trim() + ', ' + english : english;
+const DEMO_IMAGES = [
+  {url:'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/1cedd7795-f99d-4691-a2f9-63b2e4a72983.png', tags:['cyber','city','neon','赛博','城市','夜','rain','street','未来']},
+  {url:'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/1ff409047-dee0-4a7e-b5e5-16af87183e26.png', tags:['fantasy','island','waterfall','奇幻','岛','瀑布','浮','ruin','遗迹']},
+  {url:'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/1e5f72766-cc7f-462c-af84-e71354a053a3.png', tags:['anime','girl','动漫','少女','樱花','portrait','人物','silver']},
+  {url:'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/16b445943-9608-4e7a-9dd0-ce0c54a03a5f.png', tags:['abstract','fluid','抽象','流体','art','marble','gold','swirl']},
+  {url:'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/19601bb0e-b31e-4686-9da5-88153216c688.png', tags:['forest','lake','森林','湖','mist','雾','nature','自然','tree','松']},
+  {url:'https://image.qwenlm.ai/public_source/7058e64c-f44c-4796-9f6a-af85d437d4b4/1a1678f14-c8e4-4197-a922-230f0924e4d6.png', tags:['space','nebula','planet','太空','星','宇宙','行星','环']}
+];
+
+/* ============ STATE ============ */
+const State = {
+  currentMode:'text',
+  uploadedFile:null,
+  uploadDataUrl:null,
+  apiSettings:null,
+  isGenerating:false,
+  seedLocked:false,
+  currentBatchResults:[],
+  galleryImages:[],
+  renderedGallery:[],
+  viewerList:[],
+  viewerIndex:0,
+  viewerZoom:1,
+  generationController:null,
+  lastParams:null,
+  startTime:0,
+  expectedDuration:0,
+  progressTimer:null,
+  promptHistory:[],
+  stats:{gens:0,success:0,fail:0,images:0},
+  domCache:new Map()
+};
+
+/* ============ DOM HELPERS ============ */
+const DOM = {
+  get(id){
+    if(!State.domCache.has(id)){
+      const el=document.getElementById(id);
+      if(el) State.domCache.set(id,el);
+    }
+    return State.domCache.get(id);
+  },
+  getVal(id,d=''){const el=this.get(id);return el?(el.value||d):d;},
+  numVal(id,d=0){const v=parseFloat(this.getVal(id));return isNaN(v)?d:v;},
+  intVal(id,d=0){const v=parseInt(this.getVal(id,10));return isNaN(v)?d:v;},
+  setText(id,t){const el=this.get(id);if(el)el.textContent=t;},
+  toggle(id,show){const el=this.get(id);if(el)el.classList.toggle('hidden',!show);}
+};
+
+/* ============ TOAST ============ */
+const Toast = {
+  icons:{success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'},
+  show(message,type='success',duration=3200){
+    const c=DOM.get('toastContainer');
+    const el=document.createElement('div');
+    el.className='toast '+type;
+    el.innerHTML=`<span style="font-size:1.1rem">${this.icons[type]||''}</span><span class="t-msg">${escapeHtml(message)}</span><span class="t-close">×</span>`;
+    c.appendChild(el);
+    const remove=()=>{el.style.transition='opacity .25s,transform .25s';el.style.opacity='0';el.style.transform='translateX(40px)';setTimeout(()=>el.remove(),250);};
+    el.querySelector('.t-close').onclick=remove;
+    if(duration>0) setTimeout(remove,duration);
+  }
+};
+
+/* ============ UTILS ============ */
+function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function fmtDate(ts){const d=new Date(ts);const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+function randSeed(){return Math.floor(Math.random()*4294967295);}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function dataUrlToBlob(dataUrl){
+  const parts=dataUrl.split(',');
+  const meta=parts[0]||'';
+  const b64=parts[1]||'';
+  const m=meta.match(/data:(.*?);/);
+  const mime=m?m[1]:'image/png';
+  const bin=atob(b64);
+  const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+
+const FileUtils = {
+  toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('文件读取失败'));r.readAsDataURL(file);});},
+  extractBase64(dataUrl){return (dataUrl&&dataUrl.includes('base64,'))?dataUrl.split('base64,')[1]:dataUrl;},
+  validate(file){
+    const max=10*1024*1024;
+    const allowed=['image/jpeg','image/png','image/webp','image/gif'];
+    if(!allowed.includes(file.type)) return {valid:false,error:'仅支持 JPG、PNG、WebP、GIF 格式'};
+    if(file.size>max) return {valid:false,error:'文件大小不能超过 10MB'};
+    return {valid:true};
+  }
+};
+
+/* ============ STORAGE ============ */
+function loadJSON(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):fallback;}catch(e){return fallback;}}
+function saveJSON(key,val){try{localStorage.setItem(key,JSON.stringify(val));return true;}catch(e){return false;}}
+
+function persistGallery(){
+  let items=State.galleryImages;
+  for(let attempt=0;attempt<8;attempt++){
+    if(saveJSON(CONFIG.STORAGE_KEY,items)) return true;
+    if(items.length<=1){
+      const meta=items.map(it=>({...it,url:(it.url&&it.url.startsWith('data:'))?'':it.url}));
+      if(saveJSON(CONFIG.STORAGE_KEY,meta)){Toast.show('本地存储空间不足，已改为仅保存元数据','warning');return false;}
+      Toast.show('本地存储空间不足，作品未能保存','error');return false;
+    }
+    items=items.slice(0,-1);
+  }
+  return false;
+}
+
+/* ============ STATS ============ */
+const Stats = {
+  load(){State.stats=loadJSON(CONFIG.STATS_KEY,{gens:0,success:0,fail:0,images:0});this.render();},
+  record(ok,count){
+    State.stats.gens++;
+    if(ok){State.stats.success++;State.stats.images+=count;}else{State.stats.fail++;}
+    saveJSON(CONFIG.STATS_KEY,State.stats);this.render();
+  },
+  render(){
+    DOM.setText('statGens',State.stats.gens);
+    DOM.setText('statGallery',State.galleryImages.length);
+    const rate=State.stats.gens?Math.round(State.stats.success/State.stats.gens*100)+'%':'-';
+    DOM.setText('statRate',rate);
+  }
+};
+
+/* ============ MODALS ============ */
+function openModal(id){const m=DOM.get(id);if(m){m.classList.add('open');}}
+function closeModal(id){const m=DOM.get(id);if(m){m.classList.remove('open');if(id==='viewerModal')State.viewerZoom=1;}}
+function topModal(){const open=[...document.querySelectorAll('.modal.open')];return open.length?open[open.length-1]:null;}
+
+/* ============ MODE ============ */
+function switchMode(mode){
+  State.currentMode=mode;
+  document.querySelectorAll('.mode-tab').forEach(b=>{
+    const active=b.dataset.mode===mode;
+    b.classList.toggle('active',active);
+    b.style.background=active?'linear-gradient(135deg,var(--primary),#8b5cf6)':'transparent';
+    b.style.color=active?'#fff':'var(--text-secondary)';
+  });
+  DOM.toggle('dropZoneWrap',mode==='image');
+}
+
+/* ============ UPLOAD ============ */
+function handleFile(file){
+  if(!file) return;
+  const v=FileUtils.validate(file);
+  if(!v.valid){Toast.show(v.error,'error');return;}
+  State.uploadedFile=file;
+  FileUtils.toBase64(file).then(url=>{
+    State.uploadDataUrl=url;
+    DOM.get('uploadPreview').src=url;
+    DOM.setText('uploadName',file.name+' · '+(file.size/1024/1024).toFixed(2)+'MB');
+    DOM.toggle('uploadPlaceholder',false);
+    DOM.toggle('uploadPreviewWrap',true);
+  }).catch(e=>Toast.show(e.message,'error'));
+}
+function clearUpload(){
+  State.uploadedFile=null;State.uploadDataUrl=null;
+  DOM.get('uploadInput').value='';
+  DOM.toggle('uploadPlaceholder',true);
+  DOM.toggle('uploadPreviewWrap',false);
+}
+
+/* ============ PARAMS ============ */
+function collectParams(prompt){
+  let seed=DOM.intVal('seedInput',-1);
+  if(!State.seedLocked || seed<0){seed=randSeed();DOM.get('seedInput').value=seed;}
+  return {
+    prompt,
+    negative:DOM.getVal('negative').trim(),
+    steps:DOM.intVal('stepsRange',30),
+    cfg:DOM.numVal('cfgRange',7),
+    sampler:DOM.getVal('samplerSelect'),
+    seed,
+    batchSize:clamp(DOM.intVal('batchRange',1),1,CONFIG.MAX_BATCH_SIZE),
+    width:DOM.intVal('widthRange',1024),
+    height:DOM.intVal('heightRange',1024),
+    denoise:DOM.numVal('denoiseRange',0.75),
+    model:DOM.getVal('modelSelect','sdxl'),
+    mode:State.currentMode
+  };
+}
+function estimateDuration(p,demo){
+  if(demo) return 1800+p.batchSize*700+Math.random()*900;
+  return Math.max(8000, p.steps*220*p.batchSize/2 + 2000);
+}
+
+/* ============ PROGRESS ============ */
+function startProgress(expectedMs){
+  State.expectedDuration=expectedMs;
+  DOM.toggle('progressArea',true);
+  DOM.setText('progressStatus','正在生成…');
+  clearInterval(State.progressTimer);
+  State.progressTimer=setInterval(()=>{
+    const elapsed=Date.now()-State.startTime;
+    const pct=Math.min(92,(elapsed/expectedMs)*100);
+    updateProgressUI(pct,elapsed,expectedMs);
+  },CONFIG.PROGRESS_UPDATE_INTERVAL);
+}
+function updateProgressUI(pct,elapsed,expected){
+  DOM.get('progressBar').style.width=pct.toFixed(1)+'%';
+  DOM.setText('progressPercent',Math.round(pct)+'%');
+  const remain=Math.max(0,expected-elapsed);
+  DOM.setText('progressEta',remain>0?(remain/1000).toFixed(1)+'s':'即将完成');
+}
+function stopProgress(success){
+  clearInterval(State.progressTimer);
+  const elapsed=Date.now()-State.startTime;
+  updateProgressUI(100,elapsed,elapsed);
+  DOM.setText('progressStatus',success?'生成完成 ✓':'已停止');
+  setTimeout(()=>DOM.toggle('progressArea',false),success?700:300);
+}
+
+/* ============ GENERATING UI ============ */
+function setGenerating(on){
+  State.isGenerating=on;
+  const btn=DOM.get('generateBtn');
+  btn.disabled=on;
+  DOM.toggle('cancelBtn',on);
+  DOM.get('genBtnText').textContent=on?'生成中…':'立即生成';
+  btn.classList.toggle('pulse-glow',on);
+  if(on) renderSkeletons(DOM.intVal('batchRange',1));
+}
+function renderSkeletons(n){
+  const grid=DOM.get('resultsGrid');
+  grid.innerHTML='';
+  DOM.toggle('resultsEmpty',false);
+  DOM.toggle('clearResults',false);
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    c.className='skeleton';
+    c.style.aspectRatio='1';
+    grid.appendChild(c);
+  }
+}
+
+/* ============ ERROR PARSING ============ */
+function parseApiError(err){
+  const raw=(err&&err.message)?err.message:String(err);
+  const lower=raw.toLowerCase();
+  let hint='';
+  if(lower.includes('model_not_found')||lower.includes('无可用渠道')||lower.includes('no available channel')||lower.includes('does not exist')){
+    hint='当前模型在你的分组下没有可用渠道。请打开「设置」→ 修改「OpenAI 模型名称」为中转后台实际支持的名字（如 dall-e-3 / gpt-image-2），或联系 API 提供方开通渠道。';
+  }else if(lower.includes('401')||lower.includes('unauthorized')||lower.includes('invalid api key')||lower.includes('incorrect api key')){
+    hint='认证失败：请检查「设置」中的 API 密钥是否正确、是否已过期。';
+  }else if(lower.includes('402')||lower.includes('insufficient')||lower.includes('余额')||lower.includes('quota')){
+    hint='额度不足：请检查中转账户余额或配额。';
+  }else if(lower.includes('403')){
+    hint='访问被拒绝：请检查密钥权限、分组设置或 IP 白名单。';
+  }else if(lower.includes('429')){
+    hint='请求过于频繁或并发超限：请稍后重试，或降低批量数量。';
+  }else if(lower.includes('failed to fetch')||lower.includes('networkerror')||lower.includes('load failed')||lower.includes('network error')){
+    hint='网络请求失败：请确认接口地址可达；浏览器直连要求 API 开启 CORS 跨域，否则需通过本地代理转发。';
+  }else if(err&&err.name==='AbortError'){
+    hint='请求超时或被取消：可在「设置」中增大超时时间后重试。';
+  }else if(lower.includes('502')||lower.includes('503')||lower.includes('504')){
+    hint='上游服务暂时不可用：稍后重试，或在「设置」中更换模型名称 / 渠道。';
+  }else if(lower.includes('content_policy')||lower.includes('safety')||lower.includes('敏感')){
+    hint='提示词可能触发内容安全策略：请调整提示词后重试。';
+  }
+  return {message:raw,hint};
+}
+
+function renderErrorCard(parsed,params){
+  const grid=DOM.get('resultsGrid');
+  grid.innerHTML='';
+  DOM.toggle('resultsEmpty',false);
+  DOM.toggle('clearResults',true);
+  DOM.setText('resultCount','0');
+  const card=document.createElement('div');
+  card.className='error-card fade-in';
+  card.innerHTML=`
+    <div class="flex items-start gap-3">
+      <div style="font-size:1.7rem;line-height:1">⚠️</div>
+      <div style="flex:1;min-width:0">
+        <div class="font-bold" style="color:var(--error)">生成失败</div>
+        <div class="text-sm mt-1" style="word-break:break-all;color:var(--text-primary)">${escapeHtml(parsed.message)}</div>
+        ${parsed.hint?`<div class="text-xs mt-2 p-2.5 rounded-lg" style="background:var(--primary-soft);color:#a5b4fc">💡 ${escapeHtml(parsed.hint)}</div>`:''}
+        <details class="mt-2">
+          <summary class="text-xs cursor-pointer flex items-center gap-1" style="color:var(--text-muted)"><span class="details-arrow">▸</span> 查看通用排查步骤</summary>
+          <ul class="text-xs mt-2 pl-5 list-disc space-y-1" style="color:var(--text-secondary)">
+            <li>确认中转后台你的分组 / 渠道下该模型名称确实可用</li>
+            <li>在「设置」中更换「OpenAI 模型名称」（常见：gpt-image-1、gpt-image-2、dall-e-3）</li>
+            <li>使用「设置 → 测试连接」验证地址与密钥</li>
+            <li>浏览器直连需 API 开启 CORS，否则请用本地代理转发请求</li>
+            <li>批量数量过大或尺寸过高可能导致超时，可减小后重试</li>
+          </ul>
+        </details>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <button class="btn btn-primary err-retry" style="padding:.5rem 1.1rem">🔄 重试</button>
+          <button class="btn btn-ghost err-copy" style="padding:.5rem 1.1rem">复制错误</button>
+          <button class="btn btn-ghost err-settings" style="padding:.5rem 1.1rem">去修改设置</button>
+        </div>
+      </div>
+    </div>`;
+  grid.appendChild(card);
+  card.querySelector('.err-retry').onclick=()=>generateImage(params);
+  card.querySelector('.err-copy').onclick=()=>{copyText(parsed.message);Toast.show('错误信息已复制','success');};
+  card.querySelector('.err-settings').onclick=()=>openModal('settingsModal');
+}
+
+/* ============ BLOB HELPERS ============ */
+function b64ToBlobUrl(b64){
+  try{
+    const bc=atob(b64);const b=new Uint8Array(bc.length);
+    for(let i=0;i<bc.length;i++) b[i]=bc.charCodeAt(i);
+    return URL.createObjectURL(new Blob([b],{type:'image/png'}));
+  }catch(e){return '';}
+}
+
+/* ============ FETCH HELPERS ============ */
+function fetchWithTimeout(url,options={},timeoutMs=60000){
+  const controller=new AbortController();
+  const ext=options.signal;
+  if(ext){if(ext.aborted)controller.abort();else ext.addEventListener('abort',()=>controller.abort(),{once:true});}
+  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+  return fetch(url,{...options,signal:controller.signal}).finally(()=>clearTimeout(timer));
+}
+function waitWithSignal(ms,signal){
+  return new Promise((res,rej)=>{
+    if(signal&&signal.aborted) return rej(new DOMException('Aborted','AbortError'));
+    const t=setTimeout(res,ms);
+    if(signal) signal.addEventListener('abort',()=>{clearTimeout(t);rej(new DOMException('Aborted','AbortError'));},{once:true});
+  });
+}
+
+/* ============ DEMO API ============ */
+function pickDemoImages(prompt,n){
+  const p=(prompt||'').toLowerCase();
+  const match=DEMO_IMAGES.find(d=>d.tags.some(t=>p.includes(t.toLowerCase())));
+  const pool=match?[match,...DEMO_IMAGES.filter(d=>d!==match)]:[...DEMO_IMAGES].sort(()=>Math.random()-.5);
+  const out=[];
+  for(let i=0;i<n;i++) out.push(pool[i%pool.length].url);
+  return out;
+}
+async function callDemoAPI(params,signal){
+  await waitWithSignal(estimateDuration(params,true),signal);
+  return pickDemoImages(params.prompt,params.batchSize);
+}
+
+/* ============ OPENAI SIZE MAP ============ */
+function mapOpenAISize(model,w,h){
+  if(/dall-e-2/i.test(model)) return '1024x1024';
+  const landscape=w>h, portrait=h>w;
+  if(/dall-e-3/i.test(model)){
+    if(landscape) return '1792x1024';
+    if(portrait) return '1024x1792';
+    return '1024x1024';
+  }
+  if(landscape) return '1536x1024';
+  if(portrait) return '1024x1536';
+  return '1024x1024';
+}
+function resolveOpenAIModel(settings,payload){
+  const custom=(settings.openaiModel||'').trim();
+  if(custom) return custom;
+  if(payload.model==='dall-e-3') return 'dall-e-3';
+  if(payload.model==='gpt-image-2') return 'gpt-image-2';
+  return 'gpt-image-1';
+}
+
+/* ============ API ============ */
+const API = {
+  async callSDWebUI(baseUrl,headers,payload,timeout,mode,signal){
+    const endpoint=mode==='image'?'/sdapi/v1/img2img':'/sdapi/v1/txt2img';
+    const res=await fetchWithTimeout(baseUrl+endpoint,{method:'POST',headers,body:JSON.stringify(payload),signal},timeout);
+    if(!res.ok){const t=await res.text().catch(()=>'');throw new Error(`SDWebUI 错误 ${res.status}: ${t.slice(0,300)}`);}
+    const data=await res.json();
+    if(!data.images||!data.images.length) throw new Error('接口未返回图片数据');
+    return data.images.map(b=>b.startsWith('data:')?b:`data:image/png;base64,${b}`);
+  },
+
+  async callOpenAI(baseUrl,headers,payload,timeout,signal,settings){
+    const model=resolveOpenAIModel(settings,payload);
+    let n=payload.batchSize;
+    if(/dall-e-3/i.test(model)&&n>1){n=1;Toast.show('dall-e-3 每次仅支持 1 张，已自动调整','warning');}
+    const body={
+      model,
+      prompt:payload.prompt,
+      n,
+      size:mapOpenAISize(model,payload.width,payload.height)
+    };
+    if(/dall-e/i.test(model)) body.response_format='b64_json';
+    const res=await fetchWithTimeout(baseUrl+'/v1/images/generations',{method:'POST',headers,body:JSON.stringify(body),signal},timeout);
+    if(!res.ok){const t=await res.text().catch(()=>'');throw new Error(`OpenAI 错误 ${res.status}: ${t.slice(0,300)}`);}
+    const data=await res.json();
+    if(!data.data||!data.data.length) throw new Error('接口未返回图片数据');
+    const imgs=data.data.map(d=>d.url||(d.b64_json?b64ToBlobUrl(d.b64_json):'')).filter(Boolean);
+    if(!imgs.length) throw new Error('接口返回数据中缺少图片字段');
+    return imgs;
+  },
+
+  async callOpenAIEdits(baseUrl,headers,payload,timeout,signal,settings,imageDataUrl){
+    const model=resolveOpenAIModel(settings,payload);
+    const fd=new FormData();
+    fd.append('model',model);
+    fd.append('prompt',payload.prompt);
+    fd.append('n','1');
+    fd.append('size',mapOpenAISize(model,payload.width,payload.height));
+    fd.append('image',dataUrlToBlob(imageDataUrl),'input.png');
+    const h={...headers};delete h['Content-Type'];
+    const res=await fetchWithTimeout(baseUrl+'/v1/images/edits',{method:'POST',headers:h,body:fd,signal},timeout);
+    if(!res.ok){const t=await res.text().catch(()=>'');throw new Error(`OpenAI Edits 错误 ${res.status}: ${t.slice(0,300)}`);}
+    const data=await res.json();
+    if(!data.data||!data.data.length) throw new Error('接口未返回图片数据');
+    const imgs=data.data.map(d=>d.url||(d.b64_json?b64ToBlobUrl(d.b64_json):'')).filter(Boolean);
+    if(!imgs.length) throw new Error('接口返回数据中缺少图片字段');
+    return imgs;
+  },
+
+  async callCustom(baseUrl,headers,payload,timeout,signal){
+    const res=await fetchWithTimeout(baseUrl,{method:'POST',headers,body:JSON.stringify(payload),signal},timeout);
+    if(!res.ok){const t=await res.text().catch(()=>'');throw new Error(`自定义接口错误 ${res.status}: ${t.slice(0,300)}`);}
+    const data=await res.json();
+    let imgs=data.images||data.data||data.output||[];
+    if(Array.isArray(imgs)) imgs=imgs.map(x=>typeof x==='string'?x:(x.url||x.image||(x.b64_json?b64ToBlobUrl(x.b64_json):''))).filter(Boolean);
+    if(!imgs.length) throw new Error('接口返回格式无法识别，需包含 images / data 数组');
+    return imgs;
+  }
+};
+
+async function callGenerationAPI(params){
+  const settings=State.apiSettings||{};
+  const signal=State.generationController?State.generationController.signal:null;
+
+  if(settings.demoMode) return callDemoAPI(params,signal);
+
+  const baseUrl=(settings.apiUrl||'').replace(/\/$/,'');
+  const apiType=settings.apiType||'sdwebui';
+  const timeout=(settings.timeout||CONFIG.DEFAULT_TIMEOUT)*1000;
+
+  const headers={'Content-Type':'application/json'};
+  if(settings.apiKey) headers.Authorization=apiType==='openai'?`Bearer ${settings.apiKey}`:settings.apiKey;
+
+  const payload={
+    prompt:params.prompt,
+    negative_prompt:params.negative||'',
+    steps:params.steps,
+    cfg_scale:params.cfg,
+    sampler_name:params.sampler,
+    seed:params.seed,
+    width:params.width,
+    height:params.height,
+    batch_size:params.batchSize,
+    n:params.batchSize,
+    model:resolveOpenAIModel(settings,params)
+  };
+
+  const isImg2Img=params.mode==='image'&&!!State.uploadDataUrl;
+
+  if(apiType==='openai'){
+    if(isImg2Img) return API.callOpenAIEdits(baseUrl,headers,payload,timeout,signal,settings,State.uploadDataUrl);
+    return API.callOpenAI(baseUrl,headers,payload,timeout,signal,settings);
+  }
+
+  if(isImg2Img){
+    const base64=FileUtils.extractBase64(State.uploadDataUrl);
+    if(!base64||base64.length<100) throw new Error('图片 Base64 转换失败');
+    payload.init_images=[base64];
+    payload.denoising_strength=params.denoise;
+    payload.resize_mode=0;
+  }
+
+  if(apiType==='sdwebui') return API.callSDWebUI(baseUrl,headers,payload,timeout,params.mode,signal);
+  if(apiType==='custom') return API.callCustom(baseUrl,headers,payload,timeout,signal);
+  throw new Error('未知的接口类型');
+}
+
+/* ============ GENERATE ============ */
+async function generateImage(retryParams){
+  if(State.isGenerating) return;
+  const useRetry=retryParams&&typeof retryParams==='object';
+  const prompt=useRetry?retryParams.prompt:DOM.getVal('prompt').trim();
+  if(!prompt){Toast.show('请输入提示词','error');DOM.get('prompt').focus();return;}
+  if(!useRetry&&State.currentMode==='image'&&!State.uploadedFile){Toast.show('图生图模式需要先上传参考图片','error');return;}
+  const settings=State.apiSettings||{};
+  if(!settings.demoMode&&!settings.apiUrl){Toast.show('请先在「设置」中配置 API，或开启演示模式','warning');openModal('settingsModal');return;}
+
+  const params=useRetry?retryParams:collectParams(prompt);
+  State.lastParams=params;
+  addPromptHistory(params.prompt);
+  State.generationController=new AbortController();
+  setGenerating(true);
+  State.startTime=Date.now();
+  startProgress(estimateDuration(params,!!settings.demoMode));
+
+  try{
+    const urls=await callGenerationAPI(params);
+    stopProgress(true);
+    handleResults(urls,params);
+    Stats.record(true,urls.length);
+    Toast.show(`生成完成，共 ${urls.length} 张图片`,'success');
+  }catch(err){
+    stopProgress(false);
+    if(err&&err.name==='AbortError'&&!State.generationController){
+      Toast.show('已取消生成','info');
+    }else if(err&&err.name==='AbortError'){
+      const parsed={message:'请求超时或已被取消',hint:'可在「设置」中增大超时时间后重试。'};
+      Stats.record(false,0);
+      renderErrorCard(parsed,params);
+      Toast.show('请求超时或已取消','warning');
+    }else{
+      Stats.record(false,0);
+      const parsed=parseApiError(err);
+      renderErrorCard(parsed,params);
+      Toast.show('生成失败：'+parsed.message,'error',6000);
+    }
+  }finally{
+    State.generationController=null;
+    setGenerating(false);
+  }
+}
+
+function handleResults(urls,params){
+  const items=urls.map((url,i)=>({
+    id:uid(),url,prompt:params.prompt,negative:params.negative,
+    model:params.model,mode:params.mode,steps:params.steps,cfg:params.cfg,
+    sampler:params.sampler,seed:params.seed,width:params.width,height:params.height,
+    denoise:params.denoise,batchSize:params.batchSize,createdAt:Date.now()+i
+  }));
+  State.currentBatchResults=items;
+  State.galleryImages=[...items,...State.galleryImages].slice(0,CONFIG.MAX_GALLERY_SIZE);
+  persistGallery();
+  renderResults();
+  renderGallery();
+  Stats.render();
+}
+
+/* ============ RESULTS RENDER ============ */
+function resultCard(item,idx){
+  const wrap=document.createElement('div');
+  wrap.className='img-fade-in relative rounded-xl overflow-hidden';
+  wrap.style.border='1px solid var(--border)';
+  wrap.style.background='var(--bg-elevated)';
+  wrap.innerHTML=`
+    <div style="aspect-ratio:1;overflow:hidden;cursor:pointer" data-view="${idx}">
+      <img src="${item.url}" alt="result" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy">
+    </div>
+    <div class="absolute top-2 left-2 right-2 flex justify-between">
+      <span class="badge badge-primary">${escapeHtml(MODEL_NAMES[item.model]||item.model)}</span>
+      <span class="badge">${item.mode==='image'?'图生图':'文生图'}</span>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 p-2 flex gap-2" style="background:linear-gradient(to top,rgba(0,0,0,.85),transparent)">
+      <button class="icon-btn" data-act="view" title="查看">🔍</button>
+      <button class="icon-btn" data-act="download" title="下载">⬇</button>
+      <button class="icon-btn" data-act="copy" title="复制提示词">📋</button>
+    </div>`;
+  wrap.querySelector('[data-view]').onclick=()=>openViewer(State.currentBatchResults,idx);
+  wrap.querySelectorAll('[data-act]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const a=b.dataset.act;
+    if(a==='view') openViewer(State.currentBatchResults,idx);
+    else if(a==='download') downloadImage(item.url,'ai_'+item.id+'.png');
+    else if(a==='copy'){copyText(item.prompt);Toast.show('提示词已复制','success');}
+  });
+  return wrap;
+}
+function renderResults(){
+  const grid=DOM.get('resultsGrid');
+  grid.innerHTML='';
+  const list=State.currentBatchResults;
+  DOM.setText('resultCount',list.length);
+  DOM.toggle('resultsEmpty',list.length===0);
+  DOM.toggle('clearResults',list.length>0);
+  list.forEach((it,i)=>grid.appendChild(resultCard(it,i)));
+}
+
+/* ============ GALLERY RENDER ============ */
+function getFilteredGallery(){
+  const q=DOM.getVal('gallerySearch').trim().toLowerCase();
+  const f=DOM.getVal('galleryFilter','all');
+  return State.galleryImages.filter(it=>{
+    if(f!=='all'&&it.mode!==f) return false;
+    if(q&&!(it.prompt||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function galleryThumb(item,idx){
+  const t=document.createElement('div');
+  t.className='thumb fade-in';
+  const hasImg=!!item.url;
+  t.innerHTML=`
+    ${hasImg?`<img src="${item.url}" alt="gallery" loading="lazy">`:`<div class="w-full h-full flex items-center justify-center" style="color:var(--text-muted);font-size:.7rem">仅元数据</div>`}
+    <div class="top-badges">
+      <span class="badge badge-primary" style="font-size:.6rem">${escapeHtml(MODEL_NAMES[item.model]||item.model)}</span>
+      <span class="badge" style="font-size:.6rem">${item.mode==='image'?'图生图':'文生图'}</span>
+    </div>
+    <div class="overlay">
+      <div class="text-[11px] text-white truncate">${escapeHtml(item.prompt)}</div>
+      <div class="flex gap-1">
+        <button class="icon-btn" data-act="view" title="查看">🔍</button>
+        <button class="icon-btn" data-act="download" title="下载">⬇</button>
+        <button class="icon-btn" data-act="reuse" title="复用参数">♻</button>
+        <button class="icon-btn" data-act="del" title="删除">🗑</button>
+      </div>
+    </div>`;
+  if(hasImg) t.querySelector('img').onclick=()=>openViewer(State.renderedGallery,idx);
+  t.querySelectorAll('[data-act]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const a=b.dataset.act;
+    if(a==='view'){if(hasImg)openViewer(State.renderedGallery,idx);else Toast.show('该作品仅保存了元数据','warning');}
+    else if(a==='download'){if(hasImg)downloadImage(item.url,'ai_'+item.id+'.png');else Toast.show('无图片可下载','warning');}
+    else if(a==='reuse') reuseParams(item);
+    else if(a==='del') deleteGalleryItem(item.id);
+  });
+  return t;
+}
+function renderGallery(){
+  const grid=DOM.get('galleryGrid');
+  grid.innerHTML='';
+  const list=getFilteredGallery();
+  State.renderedGallery=list;
+  DOM.setText('galleryCount',State.galleryImages.length+' / '+CONFIG.MAX_GALLERY_SIZE);
+  DOM.toggle('galleryEmpty',list.length===0);
+  list.forEach((it,i)=>grid.appendChild(galleryThumb(it,i)));
+  Stats.render();
+}
+function deleteGalleryItem(id){
+  State.galleryImages=State.galleryImages.filter(it=>it.id!==id);
+  State.currentBatchResults=State.currentBatchResults.filter(it=>it.id!==id);
+  persistGallery();renderGallery();renderResults();
+  Toast.show('已删除','info');
+}
+function clearGallery(){
+  if(!State.galleryImages.length) return;
+  if(!confirm('确定清空全部画廊作品？此操作不可恢复。')) return;
+  State.galleryImages=[];State.currentBatchResults=[];
+  persistGallery();renderGallery();renderResults();
+  Toast.show('画廊已清空','info');
+}
+function exportGallery(){
+  if(!State.galleryImages.length){Toast.show('画廊为空，无可导出内容','warning');return;}
+  const blob=new Blob([JSON.stringify(State.galleryImages,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='ai_gallery_'+Date.now()+'.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  Toast.show('画廊已导出','success');
+}
+
+/* ============ VIEWER ============ */
+function openViewer(list,index){
+  if(!list||!list.length) return;
+  State.viewerList=list;State.viewerIndex=clamp(index,0,list.length-1);State.viewerZoom=1;
+  renderViewer();openModal('viewerModal');
+}
+function renderViewer(){
+  const item=State.viewerList[State.viewerIndex];
+  if(!item) return;
+  const img=DOM.get('viewerImage');
+  img.src=item.url||'';img.style.transform='scale(1)';State.viewerZoom=1;
+  DOM.setText('viewerPrompt',item.prompt||'(空)');
+  DOM.setText('viewerCounter',(State.viewerIndex+1)+' / '+State.viewerList.length);
+  if(item.negative){DOM.toggle('viewerNegWrap',true);DOM.setText('viewerNeg',item.negative);}
+  else DOM.toggle('viewerNegWrap',false);
+  const meta=DOM.get('viewerMeta');
+  const rows=[
+    ['模型',MODEL_NAMES[item.model]||item.model],
+    ['模式',item.mode==='image'?'图生图':'文生图'],
+    ['尺寸',`${item.width} × ${item.height}`],
+    ['步数',item.steps],['CFG',item.cfg],['采样器',item.sampler],
+    ['种子',item.seed],['批量',item.batchSize]
+  ];
+  if(item.mode==='image') rows.push(['重绘幅度',item.denoise]);
+  rows.push(['生成时间',fmtDate(item.createdAt)]);
+  meta.innerHTML=rows.map(r=>`<div class="flex justify-between p-2 rounded-lg" style="background:var(--bg-input)"><span style="color:var(--text-muted)">${r[0]}</span><span style="color:var(--text-primary);font-weight:600">${escapeHtml(r[1])}</span></div>`).join('');
+}
+function viewerNav(dir){
+  State.viewerIndex=clamp(State.viewerIndex+dir,0,State.viewerList.length-1);
+  renderViewer();
+}
+function viewerZoom(delta){
+  State.viewerZoom=clamp(State.viewerZoom+delta,0.5,5);
+  DOM.get('viewerImage').style.transform='scale('+State.viewerZoom+')';
+}
+function viewerDownload(){const it=State.viewerList[State.viewerIndex];if(it&&it.url)downloadImage(it.url,'ai_'+it.id+'.png');}
+function viewerReuse(){const it=State.viewerList[State.viewerIndex];if(it)reuseParams(it);}
+function viewerDelete(){
+  const it=State.viewerList[State.viewerIndex];if(!it)return;
+  if(!confirm('删除这张作品？'))return;
+  deleteGalleryItem(it.id);
+  State.viewerList=State.viewerList.filter(x=>x.id!==it.id);
+  if(!State.viewerList.length){closeModal('viewerModal');return;}
+  State.viewerIndex=clamp(State.viewerIndex,0,State.viewerList.length-1);
+  renderViewer();
+}
+
+/* ============ REUSE PARAMS ============ */
+function reuseParams(item){
+  DOM.get('prompt').value=item.prompt||'';updatePromptCount();
+  DOM.get('negative').value=item.negative||'';
+  if(item.negative){DOM.toggle('negativeWrap',true);DOM.get('negArrow').style.transform='rotate(90deg)';}
+  DOM.get('stepsRange').value=item.steps;DOM.setText('stepsVal',item.steps);
+  DOM.get('cfgRange').value=item.cfg;DOM.setText('cfgVal',item.cfg);
+  DOM.get('samplerSelect').value=item.sampler;
+  DOM.get('seedInput').value=item.seed;
+  DOM.get('widthRange').value=item.width;DOM.setText('widthVal',item.width);
+  DOM.get('heightRange').value=item.height;DOM.setText('heightVal',item.height);
+  DOM.get('batchRange').value=1;DOM.setText('batchVal',1);
+  if(item.mode==='image'){DOM.get('denoiseRange').value=item.denoise;DOM.setText('denoiseVal',item.denoise);}
+  DOM.get('modelSelect').value=item.model;DOM.setText('modelBadge',MODEL_NAMES[item.model]||item.model);
+  document.querySelectorAll('.size-preset').forEach(b=>b.classList.toggle('active',+b.dataset.w===item.width&&+b.dataset.h===item.height));
+  switchMode(item.mode);
+  closeModal('viewerModal');
+  Toast.show('参数已复用到生成面板','success');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============ DOWNLOAD / COPY ============ */
+async function downloadImage(url,filename){
+  try{
+    if(url.startsWith('data:')){const a=document.createElement('a');a.href=url;a.download=filename;a.click();return;}
+    const res=await fetch(url);const blob=await res.blob();
+    const obj=URL.createObjectURL(blob);const a=document.createElement('a');a.href=obj;a.download=filename;a.click();
+    setTimeout(()=>URL.revokeObjectURL(obj),5000);
+  }catch(e){window.open(url,'_blank');}
+}
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).catch(()=>fallbackCopy(t));}
+  else fallbackCopy(t);
+}
+function fallbackCopy(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();}
+
+/* ============ PROMPT HISTORY ============ */
+function addPromptHistory(p){
+  p=(p||'').trim();if(!p)return;
+  State.promptHistory=State.promptHistory.filter(x=>x!==p);
+  State.promptHistory.unshift(p);
+  State.promptHistory=State.promptHistory.slice(0,20);
+  saveJSON(CONFIG.HISTORY_KEY,State.promptHistory);
+}
+function renderHistoryPopover(){
+  const pop=DOM.get('historyPopover');
+  if(!State.promptHistory.length){pop.innerHTML='<div class="popover-item" style="color:var(--text-muted)">暂无历史提示词</div>';}
+  else pop.innerHTML=State.promptHistory.map(h=>`<div class="popover-item" title="${escapeHtml(h)}">${escapeHtml(h)}</div>`).join('');
+  pop.querySelectorAll('.popover-item').forEach((el,i)=>el.onclick=()=>{
+    if(State.promptHistory[i]){DOM.get('prompt').value=State.promptHistory[i];updatePromptCount();}
+    pop.classList.add('hidden');
+  });
+  pop.classList.toggle('hidden');
+}
+
+/* ============ STYLE CHIPS ============ */
+function buildStyleChips(){
+  const c=DOM.get('styleChips');c.innerHTML='';
+  STYLE_PRESETS.forEach(s=>{
+    const b=document.createElement('button');b.className='chip';b.textContent=s.name;
+    b.onclick=()=>{
+      const ta=DOM.get('prompt');const cur=ta.value.trim();
+      if(cur.toLowerCase().includes(s.prompt.toLowerCase())){Toast.show('该风格已添加','info');return;}
+      ta.value=cur?(cur+', '+s.prompt):s.prompt;
+      updatePromptCount();
     };
     c.appendChild(b);
   });
 }
 
-function toggleDemo() {
-  isDemo = !isDemo;
-  document.getElementById('modeBtn').textContent = isDemo ? '🎮 演示模式' : '🔌 真实 API';
-  document.getElementById('hint').textContent = isDemo ? '演示模式 · 内置示例图' : 'ciyuanapi · GPT Image 2';
+/* ============ SETTINGS ============ */
+function defaultSettings(){
+  return {demoMode:true,apiType:'sdwebui',apiUrl:'',apiKey:'',timeout:CONFIG.DEFAULT_TIMEOUT,openaiModel:'gpt-image-1'};
+}
+function loadSettings(){
+  State.apiSettings=Object.assign(defaultSettings(),loadJSON(CONFIG.SETTINGS_KEY,{}));
+  applySettingsToForm();
+  toggleApiFields();
+}
+function applySettingsToForm(){
+  const s=State.apiSettings;
+  DOM.get('demoMode').checked=!!s.demoMode;
+  DOM.get('apiType').value=s.apiType||'sdwebui';
+  DOM.get('apiUrl').value=s.apiUrl||'';
+  DOM.get('apiKey').value=s.apiKey||'';
+  DOM.get('timeoutInput').value=s.timeout||CONFIG.DEFAULT_TIMEOUT;
+  DOM.get('openaiModel').value=s.openaiModel||'gpt-image-1';
+}
+function toggleApiFields(){
+  const demo=DOM.get('demoMode').checked;
+  DOM.toggle('apiFields',!demo);
+  DOM.toggle('openaiModelWrap',!demo&&DOM.getVal('apiType')==='openai');
+}
+function saveSettings(){
+  const s={
+    demoMode:DOM.get('demoMode').checked,
+    apiType:DOM.getVal('apiType','sdwebui'),
+    apiUrl:DOM.getVal('apiUrl').trim(),
+    apiKey:DOM.getVal('apiKey').trim(),
+    timeout:clamp(DOM.intVal('timeoutInput',CONFIG.DEFAULT_TIMEOUT),10,600),
+    openaiModel:DOM.getVal('openaiModel','gpt-image-1').trim()
+  };
+  if(!s.demoMode&&s.apiUrl&&!/^https?:\/\//i.test(s.apiUrl)){Toast.show('接口地址需以 http:// 或 https:// 开头','error');return;}
+  State.apiSettings=s;saveJSON(CONFIG.SETTINGS_KEY,s);
+  closeModal('settingsModal');
+  Toast.show(s.demoMode?'已开启演示模式':'设置已保存','success');
+}
+function resetSettings(){
+  if(!confirm('恢复默认设置？'))return;
+  State.apiSettings=defaultSettings();
+  saveJSON(CONFIG.SETTINGS_KEY,State.apiSettings);applySettingsToForm();toggleApiFields();
+  Toast.show('已恢复默认','info');
+}
+async function testApi(){
+  if(DOM.get('demoMode').checked){Toast.show('演示模式无需测试连接','info');return;}
+  const url=DOM.getVal('apiUrl').trim();
+  if(!url){Toast.show('请先填写接口地址','error');return;}
+  if(!/^https?:\/\//i.test(url)){Toast.show('接口地址格式不正确','error');return;}
+  const type=DOM.getVal('apiType','sdwebui');
+  const btn=DOM.get('testApiBtn');const old=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin" style="display:inline-block">⟳</span> 测试中…';
+  try{
+    const headers={'Content-Type':'application/json'};const key=DOM.getVal('apiKey').trim();
+    if(key) headers.Authorization=type==='openai'?`Bearer ${key}`:key;
+    const ep=type==='openai'?'/v1/models':(type==='sdwebui'?'/sdapi/v1/sd-models':'');
+    const res=await fetchWithTimeout(url.replace(/\/$/,'')+ep,{method:'GET',headers},10000);
+    if(res.ok) Toast.show('连接成功 ✓','success');
+    else Toast.show('连接返回 '+res.status+'，请检查地址与密钥','warning',4500);
+  }catch(e){Toast.show('连接失败：'+(e.name==='AbortError'?'超时':e.message),'error',4500);}
+  finally{btn.disabled=false;btn.innerHTML=old;}
 }
 
-async function generate() {
-  const btn = document.getElementById('genBtn');
-  const prompt = document.getElementById('prompt').value.trim();
-  const result = document.getElementById('result');
+/* ============ THEME ============ */
+function loadTheme(){
+  const t=loadJSON(CONFIG.THEME_KEY,'dark');
+  document.documentElement.classList.toggle('light',t==='light');
+  updateThemeIcon();
+}
+function toggleTheme(){
+  const light=document.documentElement.classList.toggle('light');
+  saveJSON(CONFIG.THEME_KEY,light?'light':'dark');
+  updateThemeIcon();
+}
+function updateThemeIcon(){
+  const light=document.documentElement.classList.contains('light');
+  DOM.get('themeIcon').innerHTML=light
+    ?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/>'
+    :'<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>';
+}
 
-  if (!prompt) { alert('请输入提示词'); return; }
+/* ============ PROMPT COUNTER ============ */
+function updatePromptCount(){DOM.setText('promptCount',DOM.getVal('prompt').length);}
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading" style="display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px"></span> 生成中...';
-  
-  if (isDemo) {
-    // 演示模式
-    result.innerHTML = '';
-    await new Promise(r => setTimeout(r, 1500));
-    const count = parseInt(document.getElementById('count').value);
-    for (let i = 0; i < count; i++) {
-      const img = DEMO_IMGS[Math.floor(Math.random() * DEMO_IMGS.length)];
-      result.innerHTML += `<img src="${img}" alt="demo">`;
+/* ============ BIND EVENTS ============ */
+function bindEvents(){
+  document.querySelectorAll('.mode-tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));
+
+  const dz=DOM.get('dropZone'),ui=DOM.get('uploadInput');
+  dz.onclick=(e)=>{if(e.target.id!=='removeUpload'&&!e.target.closest('#removeUpload')){if(!State.uploadedFile)ui.click();}};
+  ui.onchange=(e)=>handleFile(e.target.files[0]);
+  DOM.get('removeUpload').onclick=(e)=>{e.stopPropagation();clearUpload();};
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)handleFile(f);});
+
+  DOM.get('prompt').addEventListener('input',updatePromptCount);
+  DOM.get('inspireBtn').onclick=()=>{const p=INSPIRATION[Math.floor(Math.random()*INSPIRATION.length)];DOM.get('prompt').value=p;updatePromptCount();Toast.show('已填入灵感提示词','success');};
+  DOM.get('historyBtn').onclick=(e)=>{e.stopPropagation();renderHistoryPopover();};
+  DOM.get('clearPromptBtn').onclick=()=>{DOM.get('prompt').value='';updatePromptCount();};
+  document.addEventListener('click',e=>{if(!e.target.closest('#historyBtn')&&!e.target.closest('#historyPopover'))DOM.get('historyPopover').classList.add('hidden');});
+
+  DOM.get('negativeToggle').onclick=()=>{const w=DOM.get('negativeWrap');const show=w.classList.contains('hidden');DOM.toggle('negativeWrap',show);DOM.get('negArrow').style.transform=show?'rotate(90deg)':'rotate(0)';};
+
+  DOM.get('stepsRange').oninput=()=>DOM.setText('stepsVal',DOM.get('stepsRange').value);
+  DOM.get('cfgRange').oninput=()=>DOM.setText('cfgVal',DOM.get('cfgRange').value);
+  DOM.get('batchRange').oninput=()=>DOM.setText('batchVal',DOM.get('batchRange').value);
+  DOM.get('denoiseRange').oninput=()=>DOM.setText('denoiseVal',parseFloat(DOM.get('denoiseRange').value).toFixed(2));
+  DOM.get('widthRange').oninput=()=>{DOM.setText('widthVal',DOM.get('widthRange').value);clearSizePresetActive();};
+  DOM.get('heightRange').oninput=()=>{DOM.setText('heightVal',DOM.get('heightRange').value);clearSizePresetActive();};
+
+  document.querySelectorAll('.size-preset').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.size-preset').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    DOM.get('widthRange').value=b.dataset.w;DOM.setText('widthVal',b.dataset.w);
+    DOM.get('heightRange').value=b.dataset.h;DOM.setText('heightVal',b.dataset.h);
+  });
+
+  DOM.get('seedDice').onclick=()=>{DOM.get('seedInput').value=randSeed();};
+  DOM.get('seedLock').onclick=()=>{
+    State.seedLocked=!State.seedLocked;
+    DOM.get('seedLock').style.background=State.seedLocked?'var(--primary)':'';
+    DOM.get('seedLock').style.color=State.seedLocked?'#fff':'';
+    DOM.get('lockIcon').innerHTML=State.seedLocked
+      ?'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+      :'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>';
+    Toast.show(State.seedLocked?'种子已锁定':'种子未锁定','info',1800);
+  };
+
+  DOM.get('modelSelect').onchange=()=>DOM.setText('modelBadge',MODEL_NAMES[DOM.getVal('modelSelect')]||'');
+
+  DOM.get('generateBtn').onclick=()=>generateImage();
+  DOM.get('cancelBtn').onclick=()=>{if(State.generationController){State.generationController.abort();State.generationController=null;}};
+  DOM.get('clearResults').onclick=()=>{State.currentBatchResults=[];renderResults();};
+
+  DOM.get('gallerySearch').addEventListener('input',renderGallery);
+  DOM.get('galleryFilter').onchange=renderGallery;
+  DOM.get('exportBtn').onclick=exportGallery;
+  DOM.get('clearGalleryBtn').onclick=clearGallery;
+
+  DOM.get('settingsBtn').onclick=()=>openModal('settingsModal');
+  DOM.get('helpBtn').onclick=()=>openModal('helpModal');
+  DOM.get('themeBtn').onclick=toggleTheme;
+
+  // ciyuanapi 预设配置（自动保存，无需再点保存按钮）
+  DOM.get('presetCiyuanapi').onclick=()=>{
+    DOM.get('demoMode').checked=false;
+    DOM.get('apiType').value='openai';
+    DOM.get('apiUrl').value='https://code.ciyuanapi.xyz';
+    DOM.get('apiKey').value='sk-5toBMYlaiN7ZwozNXF0yb96yegUXlROFcBBydjHyXU1WhVXi';
+    DOM.get('openaiModel').value='gpt-image-2';
+    DOM.get('timeoutInput').value='180';
+    toggleApiFields();
+    // 自动保存设置
+    saveSettings();
+    closeModal('settingsModal');
+    Toast.show('✅ ciyuanapi 已接入！现在可以开始生图了','success',5000);
+  };
+
+  DOM.get('demoMode').onchange=toggleApiFields;
+  DOM.get('apiType').onchange=toggleApiFields;
+  DOM.get('saveSettingsBtn').onclick=saveSettings;
+  DOM.get('resetSettingsBtn').onclick=resetSettings;
+  DOM.get('testApiBtn').onclick=testApi;
+
+  DOM.get('viewerPrev').onclick=()=>viewerNav(-1);
+  DOM.get('viewerNext').onclick=()=>viewerNav(1);
+  DOM.get('viewerZoomIn').onclick=()=>viewerZoom(0.25);
+  DOM.get('viewerZoomOut').onclick=()=>viewerZoom(-0.25);
+  DOM.get('viewerZoomReset').onclick=()=>{State.viewerZoom=1;DOM.get('viewerImage').style.transform='scale(1)';};
+  DOM.get('viewerDownload').onclick=viewerDownload;
+  DOM.get('viewerReuse').onclick=viewerReuse;
+  DOM.get('viewerDelete').onclick=viewerDelete;
+  DOM.get('copyPromptBtn').onclick=()=>{const it=State.viewerList[State.viewerIndex];if(it){copyText(it.prompt);Toast.show('提示词已复制','success');}};
+  DOM.get('viewerImage').addEventListener('wheel',e=>{e.preventDefault();viewerZoom(e.deltaY<0?0.2:-0.2);},{passive:false});
+
+  document.querySelectorAll('.modal').forEach(m=>{
+    m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);});
+    m.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(m.id));
+  });
+
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();generateImage();return;}
+    if(e.key==='Escape'){const m=topModal();if(m)closeModal(m.id);return;}
+    const vm=DOM.get('viewerModal');
+    if(vm.classList.contains('open')){
+      if(e.key==='ArrowLeft')viewerNav(-1);
+      else if(e.key==='ArrowRight')viewerNav(1);
+      else if(e.key==='+'||e.key==='=')viewerZoom(0.25);
+      else if(e.key==='-')viewerZoom(-0.25);
     }
-    btn.disabled = false;
-    btn.innerHTML = '🚀 立即生成';
-    return;
-  }
+  });
+}
+function clearSizePresetActive(){document.querySelectorAll('.size-preset').forEach(x=>x.classList.remove('active'));}
 
-  // 真实 API 模式
-  try {
-    const size = document.getElementById('size').value;
-    const n = parseInt(document.getElementById('count').value);
-    const apiUrl = 'https://code.ciyuanapi.xyz/v1/images/generations';
+/* ============ INIT ============ */
+function init(){
+  const sel=DOM.get('samplerSelect');
+  sel.innerHTML=SAMPLERS.map(s=>`<option value="${s}">${s}</option>`).join('');
+  sel.value='DPM++ 2M Karras';
 
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer sk-5toBMYlaiN7ZwozNXF0yb96yegUXlROFcBBydjHyXU1WhVXi'
-      },
-      body: JSON.stringify({
-        model: 'gpt-image-2',
-        prompt: prompt,
-        n: 1,
-        size: size
-      })
-    });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      let errMsg = text.slice(0, 200);
-      if (errMsg.includes('model_not_found')) errMsg = '模型不可用，请检查模型名称';
-      result.innerHTML = `<div class="error">❌ 错误 ${res.status}: ${errMsg}</div>`;
-      return;
-    }
-
-    const data = await res.json();
-    if (!data.data || !data.data.length) {
-      result.innerHTML = '<div class="error">❌ 接口返回数据异常</div>';
-      return;
-    }
-
-    result.innerHTML = '';
-    for (const d of data.data) {
-      if (d.url) {
-        result.innerHTML += `<img src="${d.url}" alt="生成结果">`;
-      } else if (d.b64_json) {
-        // 使用 Blob 方式处理大图片，避免 data URL 过长
-        const byteChars = atob(d.b64_json);
-        const byteNums = new Array(byteChars.length);
-        for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
-        const byteArr = new Uint8Array(byteNums);
-        const blob = new Blob([byteArr], {type: 'image/png'});
-        const url = URL.createObjectURL(blob);
-        result.innerHTML += `<img src="${url}" alt="生成结果">`;
-      }
-    }
-  } catch(e) {
-    result.innerHTML = `<div class="error">❌ ${e.name}: ${e.message}</div>`;
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '🚀 立即生成';
+  buildStyleChips();
+  loadTheme();
+  loadSettings();
+  State.promptHistory=loadJSON(CONFIG.HISTORY_KEY,[]);
+  State.galleryImages=loadJSON(CONFIG.STORAGE_KEY,[]);
+  Stats.load();
+  switchMode('text');
+  bindEvents();
+  renderResults();
+  renderGallery();
+  updatePromptCount();
+  DOM.setText('modelBadge',MODEL_NAMES[DOM.getVal('modelSelect','sdxl')]);
+  console.log('🚀 AI 图片生成器 Pro 已启动（错误处理 & 模型配置已增强）');
+  if(State.apiSettings&&State.apiSettings.demoMode){
+    setTimeout(()=>Toast.show('当前为演示模式，可在「设置」中接入真实 API','info',4000),600);
   }
 }
 
-initChips();
-// 保持默认演示模式
-document.getElementById('hint').textContent = '演示模式 · 内置示例图';
+window.App={generateImage:()=>generateImage(),openModal,closeModal,Toast,State};
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
 </script>
 </body>
 </html>

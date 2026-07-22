@@ -366,6 +366,7 @@ details[open] .details-arrow{transform:rotate(90deg)}
         </div>
         <label class="switch"><input type="checkbox" id="demoMode"><span class="track"></span></label>
       </div>
+      <button id="presetCiyuanapi" class="btn btn-primary w-full" style="padding:.6rem">⚡ 快速接入 ciyuanapi（GPT Image 2 · 灵隐仙踪专用）</button>
       <div id="apiFields" class="space-y-4">
         <div>
           <div class="label"><span>接口类型</span></div>
@@ -1435,6 +1436,18 @@ function bindEvents(){
   DOM.get('settingsBtn').onclick=()=>openModal('settingsModal');
   DOM.get('helpBtn').onclick=()=>openModal('helpModal');
   DOM.get('themeBtn').onclick=toggleTheme;
+
+  // ciyuanapi 预设配置
+  DOM.get('presetCiyuanapi').onclick=()=>{
+    DOM.get('demoMode').checked=false;
+    DOM.get('apiType').value='openai';
+    DOM.get('apiUrl').value='https://code.ciyuanapi.xyz';
+    DOM.get('apiKey').value='sk-5toBMYlaiN7ZwozNXF0yb96yegUXlROFcBBydjHyXU1WhVXi';
+    DOM.get('openaiModel').value='gpt-image-2';
+    DOM.get('timeoutInput').value='180';
+    toggleApiFields();
+    Toast.show('✅ ciyuanapi 已配置！点击「保存设置」即可使用','success',4000);
+  };
 
   DOM.get('demoMode').onchange=toggleApiFields;
   DOM.get('apiType').onchange=toggleApiFields;

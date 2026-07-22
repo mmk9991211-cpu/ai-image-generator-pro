@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>ciyuanapi 测试</title></head>
+<body style="font-family:sans-serif;padding:20px;background:#f5f5f5">
+<h2>🔌 ciyuanapi 浏览器直连测试</h2>
+<textarea id="prompt" style="width:100%;height:60px;font-size:16px">a cute orange cat in sunlight</textarea>
+<button id="btn" style="padding:12px 24px;font-size:16px;margin:10px 0">🚀 生图</button>
+<div id="loading" style="display:none;color:#666">⏳ 生成中（约60-90秒）...</div>
+<div id="error" style="color:red;margin:10px 0"></div>
+<div id="result" style="margin:10px 0"></div>
+<script>
+document.getElementById('btn').onclick = async () => {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) return alert('请输入提示词');
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('error').textContent = '';
+  document.getElementById('result').innerHTML = '';
+  try {
+    const res = await fetch('https://code.ciyuanapi.xyz/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk-5toBMYlaiN7ZwozNXF0yb96yegUXlROFcBBydjHyXU1WhVXi'
+      },
+      body: JSON.stringify({
+        model: 'gpt-image-2',
+        prompt: prompt,
+        n: 1,
+        size: '1024x1024'
+      })
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      document.getElementById('error').textContent = '❌ HTTP ' + res.status + ': ' + text.slice(0,300);
+      return;
+    }
+    const data = await res.json();
+    if (data.data && data.data[0]) {
+      const d = data.data[0];
+      document.getElementById('result').innerHTML = `<p>✅ 成功！<br>revised: ${d.revised_prompt || '-'}</p>`;
+      if (d.url) {
+        document.getElementById('result').innerHTML += `<img src="${d.url}" style="max-width:400px;border-radius:8px">`;
+      } else if (d.b64_json) {
+        document.getElementById('result').innerHTML += `<img src="data:image/png;base64,${d.b64_json}" style="max-width:400px;border-radius:8px">`;
+      }
+    } else {
+      document.getElementById('error').textContent = '❌ 接口返回格式异常: ' + JSON.stringify(data).slice(0,200);
+    }
+  } catch(e) {
+    document.getElementById('error').textContent = '❌ ' + e.name + ': ' + e.message;
+  } finally {
+    document.getElementById('loading').style.display = 'none';
+  }
+};
+</script>
+</body>
+</html>

@@ -1437,7 +1437,7 @@ function bindEvents(){
   DOM.get('helpBtn').onclick=()=>openModal('helpModal');
   DOM.get('themeBtn').onclick=toggleTheme;
 
-  // ciyuanapi 预设配置
+  // ciyuanapi 预设配置（自动保存，无需再点保存按钮）
   DOM.get('presetCiyuanapi').onclick=()=>{
     DOM.get('demoMode').checked=false;
     DOM.get('apiType').value='openai';
@@ -1446,7 +1446,10 @@ function bindEvents(){
     DOM.get('openaiModel').value='gpt-image-2';
     DOM.get('timeoutInput').value='180';
     toggleApiFields();
-    Toast.show('✅ ciyuanapi 已配置！点击「保存设置」即可使用','success',4000);
+    // 自动保存设置
+    saveSettings();
+    closeModal('settingsModal');
+    Toast.show('✅ ciyuanapi 已接入！现在可以开始生图了','success',5000);
   };
 
   DOM.get('demoMode').onchange=toggleApiFields;

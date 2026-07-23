@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>代理测试</title></head>
+<body style="font-family:sans-serif;padding:20px">
+<h2>🔌 cors.eu.org 代理测试</h2>
+<textarea id="prompt" style="width:100%;height:60px">a cute cat</textarea><br>
+<button id="btn" style="padding:12px 24px;font-size:16px">🚀 测试</button>
+<div id="result"></div>
+<script>
+document.getElementById('btn').onclick=async()=>{
+  const p=document.getElementById('prompt').value.trim();
+  if(!p)return;
+  document.getElementById('result').innerHTML='⏳ 等待...';
+  try{
+    const r=await fetch('https://cors.eu.org/https://code.ciyuanapi.xyz/v1/images/generations',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer sk-5toBMYlaiN7ZwozNXF0yb96yegUXlROFcBBydjHyXU1WhVXi'},
+      body:JSON.stringify({model:'gpt-image-2',prompt:p,n:1,size:'1024x1024'})
+    });
+    if(!r.ok){const t=await r.text();document.getElementById('result').innerHTML='❌ '+r.status+': '+t.slice(0,200);return;}
+    const d=await r.json();
+    if(d.data&&d.data[0]){
+      const img=d.data[0];
+      document.getElementById('result').innerHTML='✅ 成功! revised: '+(img.revised_prompt||'-')+'<br>';
+      if(img.b64_json)document.getElementById('result').innerHTML+='<img src="data:image/png;base64,'+img.b64_json+'" style="max-width:300px">';
+    }else document.getElementById('result').innerHTML='❌ 格式异常';
+  }catch(e){document.getElementById('result').innerHTML='❌ '+e.name+': '+e.message;}
+};
+</script></body></html>

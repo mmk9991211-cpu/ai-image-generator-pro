@@ -946,7 +946,7 @@ const API = {
         prompt:payload.prompt,
         mode:'image',
         image:imageDataUrl,
-        n:'1',
+        n:1,
         size:mapOpenAISize(model,payload.width,payload.height)
       };
       const res=await fetch(baseUrl+'/v1/images/generations',{method:'POST',headers,body:JSON.stringify(body)});

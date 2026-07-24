@@ -945,7 +945,7 @@ const API = {
         model,
         prompt:payload.prompt,
         mode:'image',
-        image:imageDataUrl,
+        image:FileUtils.extractBase64(imageDataUrl),
         n:1,
         size:mapOpenAISize(model,payload.width,payload.height)
       };

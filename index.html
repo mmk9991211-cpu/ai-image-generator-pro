@@ -917,7 +917,7 @@ const API = {
 
   async callOpenAI(baseUrl,headers,payload,timeout,signal,settings){
     const model=resolveOpenAIModel(settings,payload);
-    let n=payload.batchSize;
+    let n=payload.n||payload.batchSize||1;
     if(/dall-e-3/i.test(model)&&n>1){n=1;Toast.show('dall-e-3 每次仅支持 1 张，已自动调整','warning');}
     const body={
       model,

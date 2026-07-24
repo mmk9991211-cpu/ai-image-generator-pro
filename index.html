@@ -938,24 +938,6 @@ const API = {
 
   async callOpenAIEdits(baseUrl,headers,payload,timeout,signal,settings,imageDataUrl){
     const model=resolveOpenAIModel(settings,payload);
-    const isGptImage2 = /gpt-image-2/i.test(model);
-    // ciyuanapi gpt-image-2 图生图走 /v1/images/generations + mode:image
-    if(isGptImage2){
-      const body={
-        model,
-        prompt:payload.prompt,
-        mode:'image',
-        image:FileUtils.extractBase64(imageDataUrl),
-        n:1,
-        size:mapOpenAISize(model,payload.width,payload.height)
-      };
-      const res=await fetch(baseUrl+'/v1/images/generations',{method:'POST',headers,body:JSON.stringify(body)});
-      if(!res.ok){const t=await res.text().catch(()=>'');throw new Error(`OpenAI Edits 错误 ${res.status}: ${t.slice(0,300)}`);}
-      const data=await res.json();
-      if(!data.data||!data.data.length) throw new Error('接口未返回图片数据');
-      return data.data.map(d=>d.url||(d.b64_json?b64ToBlobUrl(d.b64_json):'')).filter(Boolean);
-    }
-    // 标准 OpenAI edits endpoint
     const fd=new FormData();
     fd.append('model',model);
     fd.append('prompt',payload.prompt);

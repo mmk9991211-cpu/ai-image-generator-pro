@@ -181,6 +181,23 @@ details[open] .details-arrow{transform:rotate(90deg)}
           </div>
         </div>
 
+        <div id="dropZoneWrap2" class="hidden mb-4">
+          <div class="label mb-1"><span>📷 参考图 2（风格参考）</span><span class="text-[11px]" style="color:var(--text-muted)">可选</span></div>
+          <div id="dropZone2" class="drop-zone">
+            <input type="file" id="uploadInput2" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden">
+            <div id="uploadPlaceholder2">
+              <svg class="mx-auto mb-2" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <div class="text-sm font-semibold">拖拽第二张参考图 或 点击上传</div>
+              <div class="text-xs mt-1" style="color:var(--text-muted)">JPG / PNG / WebP / GIF，≤ 10MB</div>
+            </div>
+            <div id="uploadPreviewWrap2" class="hidden">
+              <img id="uploadPreview2" class="mx-auto rounded-lg max-h-44 object-contain" alt="preview">
+              <div id="uploadName2" class="text-xs mt-2 truncate" style="color:var(--text-secondary)"></div>
+              <button id="removeUpload2" class="btn btn-danger mt-2" style="padding:.35rem .8rem;font-size:.78rem">移除图片</button>
+            </div>
+          </div>
+        </div>
+
         <div class="relative">
           <div class="label"><span>正向提示词 <span style="color:var(--error)">*</span></span><span id="promptCount" class="text-[11px]" style="color:var(--text-muted)">0</span></div>
           <textarea id="prompt" class="textarea" placeholder="描述你想生成的画面，例如：一只在樱花树下的猫，柔和光线，电影质感，超细节…" rows="3"></textarea>
@@ -453,6 +470,7 @@ details[open] .details-arrow{transform:rotate(90deg)}
         <ol class="list-decimal pl-5 space-y-1 text-[13px]">
           <li>首次使用可在「设置」中开启 <b>演示模式</b> 直接体验，或填写你的 API 地址。</li>
           <li>选择 <b>文生图</b> 或 <b>图生图</b> 模式，输入提示词。</li>
+          <li><b>图生图</b>支持上传 <b>2张参考图</b>：主图 + 可选风格参考图。</li>
           <li>调整参数（步数、CFG、尺寸、种子等），点击「立即生成」。</li>
           <li>结果会自动保存到下方画廊，可点击查看、下载、复用参数。</li>
         </ol>
@@ -554,6 +572,8 @@ const State = {
   currentMode:'text',
   uploadedFile:null,
   uploadDataUrl:null,
+  uploadedFile2:null,
+  uploadDataUrl2:null,
   apiSettings:null,
   isGenerating:false,
   seedLocked:false,
@@ -683,27 +703,33 @@ function switchMode(mode){
     b.style.color=active?'#fff':'var(--text-secondary)';
   });
   DOM.toggle('dropZoneWrap',mode==='image');
+  DOM.toggle('dropZoneWrap2',mode==='image');
 }
 
 /* ============ UPLOAD ============ */
-function handleFile(file){
+function handleFile(file,slot){
   if(!file) return;
   const v=FileUtils.validate(file);
   if(!v.valid){Toast.show(v.error,'error');return;}
-  State.uploadedFile=file;
+  const isSlot2=slot===2;
+  const key=isSlot2?'2':'';
+  if(isSlot2) State.uploadedFile2=file; else State.uploadedFile=file;
   FileUtils.toBase64(file).then(url=>{
-    State.uploadDataUrl=url;
-    DOM.get('uploadPreview').src=url;
-    DOM.setText('uploadName',file.name+' · '+(file.size/1024/1024).toFixed(2)+'MB');
-    DOM.toggle('uploadPlaceholder',false);
-    DOM.toggle('uploadPreviewWrap',true);
+    if(isSlot2) State.uploadDataUrl2=url; else State.uploadDataUrl=url;
+    DOM.get('uploadPreview'+key).src=url;
+    DOM.setText('uploadName'+key,file.name+' · '+(file.size/1024/1024).toFixed(2)+'MB');
+    DOM.toggle('uploadPlaceholder'+key,false);
+    DOM.toggle('uploadPreviewWrap'+key,true);
   }).catch(e=>Toast.show(e.message,'error'));
 }
-function clearUpload(){
-  State.uploadedFile=null;State.uploadDataUrl=null;
-  DOM.get('uploadInput').value='';
-  DOM.toggle('uploadPlaceholder',true);
-  DOM.toggle('uploadPreviewWrap',false);
+function clearUpload(slot){
+  const isSlot2=slot===2;
+  const key=isSlot2?'2':'';
+  if(isSlot2){State.uploadedFile2=null;State.uploadDataUrl2=null;}
+  else{State.uploadedFile=null;State.uploadDataUrl=null;}
+  DOM.get('uploadInput'+key).value='';
+  DOM.toggle('uploadPlaceholder'+key,true);
+  DOM.toggle('uploadPreviewWrap'+key,false);
 }
 
 /* ============ PARAMS ============ */
@@ -936,7 +962,7 @@ const API = {
     return imgs;
   },
 
-  async callOpenAIEdits(baseUrl,headers,payload,timeout,signal,settings,imageDataUrl){
+  async callOpenAIEdits(baseUrl,headers,payload,timeout,signal,settings,imageDataUrl,imageDataUrl2){
     const model=resolveOpenAIModel(settings,payload);
     const fd=new FormData();
     fd.append('model',model);
@@ -944,6 +970,7 @@ const API = {
     fd.append('n','1');
     fd.append('size',mapOpenAISize(model,payload.width,payload.height));
     fd.append('image',dataUrlToBlob(imageDataUrl),'input.png');
+    if(imageDataUrl2) fd.append('mask',dataUrlToBlob(imageDataUrl2),'mask.png');
     const h={...headers};delete h['Content-Type'];
     const res=await fetchWithTimeout(baseUrl+'/v1/images/edits',{method:'POST',headers:h,body:fd,signal},timeout);
     if(!res.ok){const t=await res.text().catch(()=>'');throw new Error(`OpenAI Edits 错误 ${res.status}: ${t.slice(0,300)}`);}
@@ -995,7 +1022,7 @@ async function callGenerationAPI(params){
   const isImg2Img=params.mode==='image'&&!!State.uploadDataUrl;
 
   if(apiType==='openai'){
-    if(isImg2Img) return API.callOpenAIEdits(baseUrl,headers,payload,timeout,signal,settings,State.uploadDataUrl);
+    if(isImg2Img) return API.callOpenAIEdits(baseUrl,headers,payload,timeout,signal,settings,State.uploadDataUrl,State.uploadDataUrl2);
     return API.callOpenAI(baseUrl,headers,payload,timeout,signal,settings);
   }
 
@@ -1393,6 +1420,14 @@ function bindEvents(){
   ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
   ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
   dz.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)handleFile(f);});
+
+  const dz2=DOM.get('dropZone2'),ui2=DOM.get('uploadInput2');
+  dz2.onclick=(e)=>{if(e.target.id!=='removeUpload2'&&!e.target.closest('#removeUpload2')){if(!State.uploadedFile2)ui2.click();}};
+  ui2.onchange=(e)=>handleFile(e.target.files[0],2);
+  DOM.get('removeUpload2').onclick=(e)=>{e.stopPropagation();clearUpload(2);};
+  ['dragenter','dragover'].forEach(ev=>dz2.addEventListener(ev,e=>{e.preventDefault();dz2.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz2.addEventListener(ev,e=>{e.preventDefault();dz2.classList.remove('drag');}));
+  dz2.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)handleFile(f,2);});
 
   DOM.get('prompt').addEventListener('input',updatePromptCount);
   DOM.get('inspireBtn').onclick=()=>{const p=INSPIRATION[Math.floor(Math.random()*INSPIRATION.length)];DOM.get('prompt').value=p;updatePromptCount();Toast.show('已填入灵感提示词','success');};
